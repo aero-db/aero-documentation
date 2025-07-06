@@ -9,12 +9,12 @@
     "update:api": "tsx ./tools/updateApi.ts"
   },
   "devDependencies": {
-    "tsx": "^4.20.3",
-    "vitepress": "latest",
-    "vitepress-openapi": "latest"
+    "tsx": "^4.20.3"
   },
   "dependencies": {
     "@types/node": "^24.0.10",
-    "axios": "^1.10.0"
+    "axios": "^1.10.0",
+    "vitepress": "latest",
+    "vitepress-openapi": "latest"
   }
 }
