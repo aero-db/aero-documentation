@@ -13,7 +13,24 @@ export default defineConfig({
   lang: 'en-US',
   title: 'AeroDB ',
   description: 'Explore the AeroDB API with ease',
+  head: [
+      [
+        'script',
+        {
+          src: 'https://www.googletagmanager.com/gtag/js?id=G-9H8S0LMT88'
+        }
+      ],
+      [
+        'script',
+        {},
+        `
+        window.dataLayer = window.dataLayer || [];
+        ...
 
+        gtag('config', 'G-9H8S0LMT88');
+        `
+      ]
+    ],
   themeConfig: {
     nav: [{ text: 'API Reference', link: '/introduction' }],
 
