@@ -1,0 +1,2248 @@
+{
+  "openapi": "3.0.0",
+  "info": {
+    "title": "AeroDB API",
+    "version": "1.0.0",
+    "summary": "AeroDB API provides access to airport, user, country, and NOTAM data.",
+    "description": "This is the AeroDB API, providing a large scale of various aeronautical data.\n\nSome endpoints require authentication via API key.\n\nAll properties are always returned and must be provided but can be null if not applicable.\n\nSome operations allow you to filter, sort, and paginate results.\n\n```json\n/airports?filter={\"name\":\"Geneva\",\"countryCode\":\"CH\"}&limit=10&page=2\n```\n\nResults are limited to 100 items by default, this limit can be increased to 300 items per page.\n\nThis API use an IP address rate limit of around 10 queries /sec.\n\nReaching this rate limit will result in a 429 Too Many Requests response.\n\nYou can use the `X-Ratelimit-Limit` `X-Ratelimit-Reset-Ms` and `X-Ratelimit-Remaining` headers to check your current rate limit status."
+  },
+  "tags": [
+    {
+      "name": "Airport"
+    },
+    {
+      "name": "User"
+    },
+    {
+      "name": "Country"
+    },
+    {
+      "name": "Notam"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Search"
+    }
+  ],
+  "paths": {
+    "/airports": {
+      "get": {
+        "operationId": "Airports_list",
+        "summary": "Return a list of airports",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReadListAirport"
+                      }
+                    }
+                  },
+                  "additionalProperties": {
+                    "not": {}
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airport"
+        ]
+      }
+    },
+    "/airports/all": {
+      "get": {
+        "operationId": "Airports_listAll",
+        "summary": "Get a simplified list of all airports",
+        "description": "List all airports with minimal details.\n\n*Limit on this operation is increased*",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UnlimitedListParameters"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/SimplifiedAirport"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airport"
+        ]
+      }
+    },
+    "/airports/{identifier}": {
+      "get": {
+        "operationId": "Airports_get",
+        "summary": "Get a unique airport by its identifier",
+        "description": "Get a unique airport by its identifier.\n\nThis operation retreive additional information, including its runways and frequencies.",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "description": "Airport Identifier , can be the id, ICAO code or IATA code",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadAirport"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource."
+          }
+        },
+        "tags": [
+          "Airport"
+        ]
+      }
+    },
+    "/countries": {
+      "get": {
+        "operationId": "Countries_list",
+        "summary": "Return a list of countries",
+        "description": "*Limit on this operation is increased to 500*",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UnlimitedListParameters"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Country"
+                      }
+                    }
+                  },
+                  "additionalProperties": {
+                    "not": {}
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Country"
+        ]
+      }
+    },
+    "/countries/{countryId}": {
+      "get": {
+        "operationId": "Countries_get",
+        "summary": "Get a country by ID",
+        "parameters": [
+          {
+            "name": "countryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Country"
+        ]
+      }
+    },
+    "/login": {
+      "post": {
+        "operationId": "Auth_login",
+        "summary": "Authenticate a user and return a JWT token.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "email": {
+                    "type": "string"
+                  },
+                  "password": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "email",
+                  "password"
+                ],
+                "additionalProperties": {
+                  "not": {}
+                }
+              },
+              "example": {
+                "email": "john.doe@aerodb.net",
+                "password": "password123"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/me": {
+      "get": {
+        "operationId": "Auth_getCurrentUser",
+        "summary": "Get the current user based on the JWT token.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/notams": {
+      "get": {
+        "operationId": "Notams_list",
+        "summary": "Return a list of NOTAMs",
+        "description": "Return a list of NOTAMs\n\nIf unauthenticated, the result is limited to 5 items.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Notam"
+                      }
+                    }
+                  },
+                  "additionalProperties": {
+                    "not": {}
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Notam"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/notams/{notamId}": {
+      "get": {
+        "operationId": "Notams_get",
+        "summary": "Get a NOTAM by ID",
+        "parameters": [
+          {
+            "name": "notamId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Notam"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Notam"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/refreshToken": {
+      "post": {
+        "operationId": "Auth_refreshToken",
+        "summary": "Retreive a new JWT using a refresh token.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "token": {
+                      "type": "string"
+                    }
+                  },
+                  "required": [
+                    "token"
+                  ],
+                  "additionalProperties": {
+                    "not": {}
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "refreshToken": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "refreshToken"
+                ],
+                "additionalProperties": {
+                  "not": {}
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/search": {
+      "get": {
+        "operationId": "Search_search",
+        "summary": "Search in the database",
+        "parameters": [
+          {
+            "name": "query",
+            "in": "query",
+            "required": true,
+            "schema": {
+              "type": "string"
+            },
+            "explode": false
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SearchResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Search"
+        ]
+      }
+    },
+    "/signup": {
+      "post": {
+        "operationId": "Auth_signUp",
+        "summary": "Create a new user account.",
+        "parameters": [],
+        "responses": {
+          "201": {
+            "description": "The request has succeeded and a new resource has been created as a result.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Auth"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthSignup"
+              },
+              "example": {
+                "email": "john.doe@aerodb.net",
+                "password": "password123",
+                "username": "john_doe"
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users": {
+      "get": {
+        "operationId": "Users_list",
+        "summary": "Return a list of users",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/User"
+                      }
+                    }
+                  },
+                  "additionalProperties": {
+                    "not": {}
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}": {
+      "get": {
+        "operationId": "Users_get",
+        "summary": "Get a user by ID",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/users/{userId}/refreshApiKey": {
+      "post": {
+        "operationId": "Users_refresh",
+        "summary": "Refresh API key for a user",
+        "parameters": [
+          {
+            "name": "userId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/User"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "User"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    }
+  },
+  "components": {
+    "parameters": {
+      "ListParameters.filter": {
+        "name": "filter",
+        "in": "query",
+        "required": false,
+        "description": "Stringified filter expression to apply to the list.",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "ListParameters.limit": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum number of items to return per page.",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "maximum": 300,
+          "default": 100
+        },
+        "explode": false
+      },
+      "ListParameters.page": {
+        "name": "page",
+        "in": "query",
+        "required": false,
+        "description": "Page number to retrieve.",
+        "schema": {
+          "type": "integer",
+          "format": "int32",
+          "default": 1
+        },
+        "explode": false
+      },
+      "ListParameters.sort": {
+        "name": "sort",
+        "in": "query",
+        "required": false,
+        "description": "Sort order for the list.",
+        "schema": {
+          "type": "string"
+        },
+        "explode": false
+      },
+      "UnlimitedListParameters": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Maximum number of items to return per page.",
+        "schema": {
+          "type": "integer",
+          "format": "int32"
+        },
+        "explode": false
+      }
+    },
+    "schemas": {
+      "Airport": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "icaoCode",
+          "iataCode",
+          "localCode",
+          "latitude",
+          "longitude",
+          "elevation",
+          "countryCode",
+          "city",
+          "state",
+          "county",
+          "continentCode",
+          "timezone",
+          "facilityType",
+          "isPrivate",
+          "isClosed",
+          "runways",
+          "frequencies"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the airport",
+            "example": "0000-ffff-0000-ffff",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Hartsfield–Jackson Atlanta International Airport"
+          },
+          "icaoCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{4}$",
+            "description": "ICAO airport code, a four-letter alphanumeric code",
+            "example": "KATL"
+          },
+          "iataCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{3}$",
+            "description": "IATA airport code, a three-letter alphanumeric code",
+            "example": "ATL"
+          },
+          "localCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "ATL"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true,
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true,
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 1026
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Atlanta"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Georgia"
+          },
+          "county": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Fulton"
+          },
+          "continentCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContinentCode"
+              }
+            ],
+            "nullable": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "America/New_York"
+          },
+          "facilityType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FACILITY_TYPE"
+              }
+            ],
+            "nullable": true,
+            "example": "airport"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "runways": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Runway"
+            }
+          },
+          "frequencies": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Frequency"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "AuthSignup": {
+        "type": "object",
+        "required": [
+          "username",
+          "email",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "email": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 100
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "AuthenticationResult": {
+        "type": "object",
+        "required": [
+          "token",
+          "refreshToken",
+          "user"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "description": "JWT token"
+          },
+          "refreshToken": {
+            "type": "string",
+            "description": "Refresh token"
+          },
+          "user": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/User"
+              }
+            ],
+            "description": "User object"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "ContinentCode": {
+        "type": "string",
+        "enum": [
+          "AF",
+          "AN",
+          "AS",
+          "EU",
+          "NA",
+          "OC",
+          "SA",
+          "UN"
+        ],
+        "description": "ISO 3166-1 continent code"
+      },
+      "Country": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "continentCode",
+          "isoId",
+          "timezone",
+          "countryCode",
+          "alpha3",
+          "name",
+          "subdivisions"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "continentCode": {
+            "$ref": "#/components/schemas/ContinentCode"
+          },
+          "isoId": {
+            "type": "string"
+          },
+          "timezone": {
+            "type": "string"
+          },
+          "countryCode": {
+            "type": "string",
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code"
+          },
+          "alpha3": {
+            "type": "string",
+            "pattern": "^[A-Z]{3}$",
+            "description": "ISO 3166-1 alpha-3 country code"
+          },
+          "name": {
+            "type": "string"
+          },
+          "subdivisions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountrySubdivision"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "example": {
+          "id": "1",
+          "createdAt": "2020-01-01T00:00:00Z",
+          "updatedAt": "2020-01-01T00:00:00Z",
+          "continentCode": "NA",
+          "isoId": "US",
+          "timezone": "America/New_York",
+          "countryCode": "US",
+          "alpha3": "USA",
+          "name": "United States",
+          "subdivisions": [
+            {
+              "code": "CA",
+              "name": "California"
+            },
+            {
+              "code": "NY",
+              "name": "New York"
+            }
+          ]
+        }
+      },
+      "CountrySubdivision": {
+        "type": "object",
+        "required": [
+          "code",
+          "name"
+        ],
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "example": {
+          "code": "AD-07",
+          "name": "Andorra la Vella"
+        }
+      },
+      "Error": {
+        "type": "object",
+        "required": [
+          "status",
+          "code",
+          "message"
+        ],
+        "properties": {
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "code": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "FACILITY_TYPE": {
+        "type": "string",
+        "enum": [
+          "airport",
+          "heliport",
+          "seaplaneBase",
+          "balloonport",
+          "ultralight",
+          "gliderport",
+          "stolport",
+          "other"
+        ],
+        "description": "A type of facility"
+      },
+      "Frequency": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "type",
+          "description",
+          "frequency"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Frequency",
+            "example": "0000-ffff-0000-ffff",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "example": "Tower Control"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "example": "Tower"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Tower Control Frequency"
+          },
+          "frequency": {
+            "type": "number",
+            "format": "float",
+            "example": 118.83
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "NotFoundError": {
+        "type": "object",
+        "required": [
+          "statusCode",
+          "name",
+          "message"
+        ],
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              404
+            ]
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "Not Found"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "Notam": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "notamId",
+          "message",
+          "transactionId",
+          "icao",
+          "issueDate",
+          "startDate",
+          "endDate",
+          "canceledDate",
+          "source",
+          "sourceType",
+          "mapPointer",
+          "geometry",
+          "isSnowtam",
+          "isProcedure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the notam",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "notamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000,
+            "description": "The NOTAM message text."
+          },
+          "transactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "icao": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{4}$"
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canceledDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "mapPointer": {
+            "type": "string",
+            "nullable": true
+          },
+          "geometry": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSnowtam": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is a SNOWTAM.\nA SNOWTAM (Snow and/or Ice NOTAM) is a special type of NOTAM (Notice to Airmen) issued by an airport to provide pilots with critical information about hazardous conditions on the movement area (runways and taxiways) caused by snow, ice, slush, frost, or standing water"
+          },
+          "isProcedure": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is related to a procedure."
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "example": {
+          "id": "67155d167139c42577c75279",
+          "notamId": "A0611/24",
+          "message": "A0611/24 NOTAMN\n    Q) LSAS/QFATT/IV/BO/A/000/999/4614N00607E005\n    A) LSGG B) 2410310000 C) 2411132359\n    E) TRIGGER NOTAM - PERM AIRAC AMDT 010/2024:\n    MAG VAR REVISED. \n    RDO NAV AND LDG AIDS GLA, GVA AND SPR DELETED AND PAS, LOC 22, \n    DME 22 AND LOC 04 REVISED. \n    FLT PROC SPECIAL REGULATION FOR GENEVA TMA/CTR REVISED. \n    SEVERAL SID AND STAR REVISED. \n    ADC, AOC AND ARC REVISED.\n    IAC SRA RWY 04 AND IAC SRA RWY 22 WITHDRAWN. \n    SEVERAL IAC REVISED.",
+          "transactionId": "73707264",
+          "icao": "LSGG",
+          "issueDate": "2024-09-19T04:00:00.000+00:00",
+          "startDate": "2024-09-19T04:00:00.000+00:00",
+          "endDate": "2024-09-19T04:00:00.000+00:00",
+          "source": "USNS",
+          "sourceType": "I",
+          "mapPointer": "POINT(6.10895 46.23806389)",
+          "geometry": "POINT(5105901.28612306 4966695.40062213)",
+          "createdAt": "2024-09-19T04:00:00.000+00:00",
+          "updatedAt": "2024-09-19T04:00:00.000+00:00",
+          "canceledDate": null,
+          "isSnowtam": false,
+          "isProcedure": false
+        }
+      },
+      "ReadAirport": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "icaoCode",
+          "iataCode",
+          "localCode",
+          "latitude",
+          "longitude",
+          "elevation",
+          "countryCode",
+          "city",
+          "state",
+          "county",
+          "continentCode",
+          "timezone",
+          "facilityType",
+          "isPrivate",
+          "isClosed",
+          "runways",
+          "frequencies"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the airport",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Hartsfield–Jackson Atlanta International Airport"
+          },
+          "icaoCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{4}$",
+            "description": "ICAO airport code, a four-letter alphanumeric code",
+            "example": "KATL"
+          },
+          "iataCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{3}$",
+            "description": "IATA airport code, a three-letter alphanumeric code",
+            "example": "ATL"
+          },
+          "localCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "ATL"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true,
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true,
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 1026
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Atlanta"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Georgia"
+          },
+          "county": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Fulton"
+          },
+          "continentCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContinentCode"
+              }
+            ],
+            "nullable": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "America/New_York"
+          },
+          "facilityType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FACILITY_TYPE"
+              }
+            ],
+            "nullable": true,
+            "example": "airport"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "runways": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ReadRunway"
+            }
+          },
+          "frequencies": {
+            "type": "object",
+            "additionalProperties": {
+              "$ref": "#/components/schemas/ReadFrequency"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": ""
+      },
+      "ReadFrequency": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "type",
+          "description",
+          "frequency"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Frequency",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "example": "Tower Control"
+          },
+          "type": {
+            "type": "string",
+            "nullable": true,
+            "example": "Tower"
+          },
+          "description": {
+            "type": "string",
+            "nullable": true,
+            "example": "Tower Control Frequency"
+          },
+          "frequency": {
+            "type": "number",
+            "format": "float",
+            "example": 118.83
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "ReadListAirport": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "icaoCode",
+          "iataCode",
+          "localCode",
+          "latitude",
+          "longitude",
+          "elevation",
+          "countryCode",
+          "city",
+          "state",
+          "county",
+          "continentCode",
+          "timezone",
+          "facilityType",
+          "isPrivate",
+          "isClosed"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the airport",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Hartsfield–Jackson Atlanta International Airport"
+          },
+          "icaoCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{4}$",
+            "description": "ICAO airport code, a four-letter alphanumeric code",
+            "example": "KATL"
+          },
+          "iataCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{3}$",
+            "description": "IATA airport code, a three-letter alphanumeric code",
+            "example": "ATL"
+          },
+          "localCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "ATL"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true,
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true,
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 1026
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Atlanta"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Georgia"
+          },
+          "county": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Fulton"
+          },
+          "continentCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContinentCode"
+              }
+            ],
+            "nullable": true
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "America/New_York"
+          },
+          "facilityType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FACILITY_TYPE"
+              }
+            ],
+            "nullable": true,
+            "example": "airport"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "description": ""
+      },
+      "ReadRunway": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "length",
+          "width",
+          "isClosed",
+          "isLighted",
+          "lowEndIdent",
+          "lowEndElevation",
+          "lowEndHeading",
+          "lowEndDisplacedThreshold",
+          "lowEndLatitude",
+          "lowEndLongitude",
+          "highEndIdent",
+          "highEndElevation",
+          "highEndHeading",
+          "highEndDisplacedThreshold",
+          "highEndLatitude",
+          "highEndLongitude"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Runway",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "example": "Runway 4/22"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 3500
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 75
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
+          "isLighted": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "lowEndIdent": {
+            "type": "string",
+            "nullable": true,
+            "example": "4"
+          },
+          "lowEndElevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "lowEndHeading": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 40
+          },
+          "lowEndDisplacedThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "lowEndLatitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 40.7128
+          },
+          "lowEndLongitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": -74.006
+          },
+          "highEndIdent": {
+            "type": "string",
+            "nullable": true,
+            "example": "22"
+          },
+          "highEndElevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "highEndHeading": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 220
+          },
+          "highEndDisplacedThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 25
+          },
+          "highEndLatitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 40.7128
+          },
+          "highEndLongitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": -74.006
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "Runway": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "length",
+          "width",
+          "isClosed",
+          "isLighted",
+          "lowEndIdent",
+          "lowEndElevation",
+          "lowEndHeading",
+          "lowEndDisplacedThreshold",
+          "lowEndLatitude",
+          "lowEndLongitude",
+          "highEndIdent",
+          "highEndElevation",
+          "highEndHeading",
+          "highEndDisplacedThreshold",
+          "highEndLatitude",
+          "highEndLongitude"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Runway",
+            "example": "0000-ffff-0000-ffff",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "example": "Runway 4/22"
+          },
+          "length": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 3500
+          },
+          "width": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 75
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
+          "isLighted": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "lowEndIdent": {
+            "type": "string",
+            "nullable": true,
+            "example": "4"
+          },
+          "lowEndElevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "lowEndHeading": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 40
+          },
+          "lowEndDisplacedThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "lowEndLatitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 40.7128
+          },
+          "lowEndLongitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": -74.006
+          },
+          "highEndIdent": {
+            "type": "string",
+            "nullable": true,
+            "example": "22"
+          },
+          "highEndElevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 50
+          },
+          "highEndHeading": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 220
+          },
+          "highEndDisplacedThreshold": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 25
+          },
+          "highEndLatitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": 40.7128
+          },
+          "highEndLongitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "example": -74.006
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "SearchResult": {
+        "type": "object",
+        "required": [
+          "airports"
+        ],
+        "properties": {
+          "airports": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Airport"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "SimplifiedAirport": {
+        "type": "object",
+        "required": [
+          "id",
+          "icaoCode",
+          "iataCode",
+          "name"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "icaoCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "iataCode": {
+            "type": "string",
+            "nullable": true
+          },
+          "name": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "example": {
+          "id": "0000-ffff-0000-ffff",
+          "icaoCode": "KATL",
+          "iataCode": "ATL",
+          "name": "Hartsfield–Jackson Atlanta International Airport"
+        }
+      },
+      "UnauthorizedError": {
+        "type": "object",
+        "required": [
+          "statusCode",
+          "name",
+          "message"
+        ],
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              401
+            ]
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "Unauthorized"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      },
+      "User": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "username",
+          "email",
+          "isVerified"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "readOnly": true
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50
+          },
+          "email": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "readOnly": true
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        },
+        "example": {
+          "id": "123",
+          "username": "john_doe",
+          "email": "john.doe@aerodb.net",
+          "createdAt": "2020-01-01T00:00:00Z",
+          "updatedAt": "2020-01-01T00:00:00Z",
+          "isVerified": true,
+          "verificationDate": "2020-01-01T00:00:00Z",
+          "lastSeen": "2020-01-01T00:00:00Z"
+        }
+      },
+      "ValidationError": {
+        "type": "object",
+        "required": [
+          "statusCode",
+          "name",
+          "message",
+          "details"
+        ],
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              400
+            ]
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "Bad Request"
+            ]
+          },
+          "message": {
+            "type": "string"
+          },
+          "details": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        },
+        "additionalProperties": {
+          "not": {}
+        }
+      }
+    },
+    "securitySchemes": {
+      "ApiKeyAuth": {
+        "type": "apiKey",
+        "in": "query",
+        "name": "apiKey"
+      },
+      "BearerAuth": {
+        "type": "http",
+        "scheme": "Bearer"
+      }
+    }
+  }
+}

@@ -1,0 +1,20 @@
+{
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "docs:dev": "vitepress dev docs",
+    "docs:build": "vitepress build docs",
+    "docs:preview": "vitepress preview docs",
+    "start": "vitepress dev docs",
+    "update:api": "tsx ./tools/updateApi.ts"
+  },
+  "devDependencies": {
+    "tsx": "^4.20.3",
+    "vitepress": "latest",
+    "vitepress-openapi": "latest"
+  },
+  "dependencies": {
+    "@types/node": "^24.0.10",
+    "axios": "^1.10.0"
+  }
+}
