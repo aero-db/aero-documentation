@@ -33,7 +33,14 @@ export default defineConfig({
     ],
   themeConfig: {
     nav: [{ text: 'API Reference', link: '/introduction' }],
-
+    search: {
+      provider: 'local',
+      // options: {
+      //   appId: 'Q1X6Z2V9Y3',
+      //   apiKey: 'e03fa1b013cf7b5dd60158e9fbc85721',
+      //   indexName: 'Main website',
+      // }
+    },
     sidebar: [
       {
         text: '',
