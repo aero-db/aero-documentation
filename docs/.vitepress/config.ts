@@ -32,7 +32,15 @@ export default defineConfig({
       ]
     ],
   themeConfig: {
-    nav: [{ text: 'API Reference', link: '/introduction' }],
+    aside: "left",
+    logo: {
+      src: '/icon.svg',
+      alt: 'AeroDB Logo',
+    },
+    nav: [ 
+      { text: 'Pricing', link: '/pricing' },
+      { text: 'Sign in', link: '/' },
+    ],
     search: {
       provider: 'local',
       // options: {
@@ -43,7 +51,24 @@ export default defineConfig({
     },
     sidebar: [
       {
-        text: '',
+        text: "Browse",
+        items: [
+          {
+            text: 'Airports',
+            link: '/airports'
+          },
+          {
+            text: 'Notam',
+            link: '/notams'
+          },
+          {
+            text: 'Airlines',
+            link: '/airlines'
+          },
+        ]
+      },
+      {
+        text: 'API References',
         items: [
           {
             text: 'Introduction',

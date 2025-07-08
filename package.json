@@ -5,6 +5,7 @@
     "docs:dev": "vitepress dev docs",
     "docs:build": "vitepress build docs",
     "docs:preview": "vitepress preview docs",
+    "dev": "npm start",
     "start": "vitepress dev docs",
     "update:api": "tsx ./tools/updateApi.ts"
   },
