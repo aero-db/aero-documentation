@@ -10,15 +10,6 @@ export default {
   async enhanceApp({ app, router, siteData }) {
     const openapi = useOpenapi({
       spec,
-      config: {
-        server: {
-          getServers: () => {
-            return [
-              'https://api.aerodb.net',
-            ];
-          }
-        }
-      },
     });
 
     theme.enhanceApp({ app, openapi });

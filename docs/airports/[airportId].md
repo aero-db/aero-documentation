@@ -3,7 +3,7 @@
 
 ## Details
 
-## Runways
+### Runways
 
 <table v-if="data.runways && data.runways.length">
     <thead>
