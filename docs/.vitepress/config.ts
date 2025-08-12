@@ -12,8 +12,10 @@ const sidebar = useSidebar({
 export default defineConfig({
   lang: 'en-US',
   title: 'AeroDB ',
+  titleTemplate: ':title - AeroDB API Documentation',
   description: 'Explore the AeroDB API with ease',
   head: [
+      ['link', { rel: 'icon', href: '/icon.svg' }],
       [
         'script',
         {
@@ -37,9 +39,11 @@ export default defineConfig({
       src: '/icon.svg',
       alt: 'AeroDB Logo',
     },
+    
     nav: [ 
+      { text: 'Airports', link: '/tags/Airports' },
+      { text: 'Notams', link: '/tags/Notams' },
       { text: 'Pricing', link: '/pricing' },
-      { text: 'Sign in', link: '/' },
     ],
     search: {
       provider: 'local',
@@ -50,23 +54,23 @@ export default defineConfig({
       // }
     },
     sidebar: [
-      {
-        text: "Browse",
-        items: [
-          {
-            text: 'Airports',
-            link: '/airports'
-          },
-          {
-            text: 'Notam',
-            link: '/notams'
-          },
-          {
-            text: 'Airlines',
-            link: '/airlines'
-          },
-        ]
-      },
+      // {
+      //   text: "Browse",
+      //   items: [
+      //     {
+      //       text: 'Airports',
+      //       link: '/airports'
+      //     },
+      //     {
+      //       text: 'Notam',
+      //       link: '/notams'
+      //     },
+      //     {
+      //       text: 'Airlines',
+      //       link: '/airlines'
+      //     },
+      //   ]
+      // },
       {
         text: 'API References',
         items: [

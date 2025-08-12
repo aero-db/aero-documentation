@@ -1,7 +1,7 @@
 ---
 aside: false
 outline: false
-title: vitepress-openapi
+title: AeroDB
 ---
 
 <script setup lang="ts">

@@ -5,7 +5,7 @@ hero:
   text: Simple Pricing, Full Access
   tagline: Get unlimited access to powerful aviation data tools.
   image:
-    src: /logo.png
+    src: /icon.svg
     alt: AeroDB
   actions:
     - theme: brand

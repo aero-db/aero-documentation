@@ -1,6 +1,6 @@
 ---
 layout: home
-
+title: Home Page
 hero:
   name: "AeroDB"
   tagline: "Complete and simple source of aeronautical data"
@@ -11,11 +11,11 @@ hero:
     height: 128
   actions:
     - theme: brand
-      text: Browse the data
-      link: /airports
-    - theme: alt
-      text: Documentation
+      text: API documentation
       link: /introduction
+    - theme: alt
+      text: Pricing
+      link: /pricing
 features:
   - icon: 🛫
     title: Simple and Documented
