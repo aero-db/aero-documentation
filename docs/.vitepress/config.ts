@@ -79,7 +79,21 @@ export default defineConfig({
             text: 'Introduction',
             link: '/introduction',
           },
-          ...sidebar.itemsByTags(),
+          ...sidebar.generateSidebarGroups({
+      linkPrefix: "/operations/",
+      sidebarItemTemplate: ({
+        method,
+        path,
+        title
+      }) => {
+        const operation = spec.paths[path]?.[method];
+        const displayText = title || (operation ? operation.summary : path);
+        return `<div class="OASidebarItem group/oaOperationLink" style="display: grid; grid-template-columns: 1fr auto;">
+        <span class="text" style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">${displayText}</span>
+        <span class="OASidebarItem-badge OAMethodBadge--${method.toLowerCase()}">${method.toUpperCase()}</span>
+      </div>`;
+      }
+    }),
         ],
       }
     ],
