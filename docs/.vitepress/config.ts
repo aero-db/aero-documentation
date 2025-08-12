@@ -1,6 +1,7 @@
 import { defineConfig } from 'vitepress';
 import { useSidebar } from 'vitepress-openapi'
 import spec from '../public/openapi.json' with { type: 'json' }
+import { pagefindPlugin } from 'vitepress-plugin-pagefind';
 
 const sidebar = useSidebar({
   spec,
@@ -83,4 +84,7 @@ export default defineConfig({
       }
     ],
   },
+  vite: {
+    plugins: [pagefindPlugin()],
+  }
 });
