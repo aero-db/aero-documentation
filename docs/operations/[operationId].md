@@ -12,4 +12,4 @@ const route = useRoute()
 const operationId = route.data.params.operationId
 </script>
 
-<OAOperation :operationId="operationId" />
+<OAOperation :operationId="operationId" hide-branding />
