@@ -2032,25 +2032,23 @@
         ],
         "properties": {
           "id": {
-            "type": "string"
+            "type": "string",
+            "example": "0000-ffff-0000-ffff"
           },
           "icaoCode": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "KATL"
           },
           "iataCode": {
             "type": "string",
-            "nullable": true
+            "nullable": true,
+            "example": "ATL"
           },
           "name": {
-            "type": "string"
+            "type": "string",
+            "example": "Hartsfield–Jackson Atlanta International Airport"
           }
-        },
-        "example": {
-          "id": "0000-ffff-0000-ffff",
-          "icaoCode": "KATL",
-          "iataCode": "ATL",
-          "name": "Hartsfield–Jackson Atlanta International Airport"
         }
       },
       "UnauthorizedError": {
