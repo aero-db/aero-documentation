@@ -15,6 +15,7 @@ export default defineConfig({
   title: 'AeroDB ',
   titleTemplate: ':title - AeroDB API Documentation',
   description: 'Explore the AeroDB API with ease',
+  lastUpdated: true,
   head: [
       ['link', { rel: 'icon', href: '/icon.svg' }],
       [
