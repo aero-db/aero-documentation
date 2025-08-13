@@ -25,7 +25,6 @@ features:
   - icon: 🔍
     title: Filter, Query, Analyze
     details: Explore, sort and filter aviation data with powerful tools.
-    link: /airports
   - icon: 📡
     title: Always Up-to-Date
     details: Fresh aeronautical data updated regularly — ready to use and integrate in any system.

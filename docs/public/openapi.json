@@ -92,7 +92,7 @@
       "get": {
         "operationId": "Airports_listAll",
         "summary": "List airports (simplified)",
-        "description": "List all airports with minimal details.\n\n*Limit on this operation is increased*",
+        "description": "List airports with minimal details.\n\n*Limit on this operation is increased*",
         "parameters": [
           {
             "$ref": "#/components/parameters/UnlimitedListParameters"
@@ -228,7 +228,7 @@
     "/countries/{countryId}": {
       "get": {
         "operationId": "Countries_get",
-        "summary": "Get a country",
+        "summary": "Get one country",
         "parameters": [
           {
             "name": "countryId",
@@ -301,23 +301,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "type": "object",
-                "properties": {
-                  "email": {
-                    "type": "string"
-                  },
-                  "password": {
-                    "type": "string"
-                  }
-                },
-                "required": [
-                  "email",
-                  "password"
-                ]
-              },
-              "example": {
-                "email": "john.doe@aerodb.net",
-                "password": "password123"
+                "$ref": "#/components/schemas/AuthLogin"
               }
             }
           }
@@ -328,6 +312,7 @@
       "get": {
         "operationId": "Auth_getCurrentUser",
         "summary": "Get current user",
+        "description": "Get the current user based on the provided JWT.",
         "parameters": [],
         "responses": {
           "200": {
@@ -441,7 +426,8 @@
     "/notams/{notamId}": {
       "get": {
         "operationId": "Notams_get",
-        "summary": "Get a NOTAM",
+        "summary": "Get one NOTAM",
+        "description": "Return one NOTAM",
         "parameters": [
           {
             "name": "notamId",
@@ -488,6 +474,7 @@
       "post": {
         "operationId": "Auth_refreshToken",
         "summary": "Retreive a new JWT",
+        "description": "Request a new JWT using a refresh token.",
         "parameters": [],
         "responses": {
           "201": {
@@ -630,11 +617,6 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/AuthSignup"
-              },
-              "example": {
-                "email": "john.doe@aerodb.net",
-                "password": "password123",
-                "username": "john_doe"
               }
             }
           }
@@ -710,7 +692,7 @@
     "/users/{userId}": {
       "get": {
         "operationId": "Users_get",
-        "summary": "Get a user",
+        "summary": "Get one user",
         "parameters": [
           {
             "name": "userId",
@@ -756,7 +738,7 @@
     "/users/{userId}/refreshApiKey": {
       "post": {
         "operationId": "Users_refresh",
-        "summary": "Refresh API key for a user",
+        "summary": "Refresh API key",
         "parameters": [
           {
             "name": "userId",
@@ -1014,6 +996,27 @@
           }
         }
       },
+      "AuthLogin": {
+        "type": "object",
+        "required": [
+          "username",
+          "password"
+        ],
+        "properties": {
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "john_doe"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 100,
+            "example": "pA$$w0rd123"
+          }
+        }
+      },
       "AuthSignup": {
         "type": "object",
         "required": [
@@ -1025,18 +1028,21 @@
           "username": {
             "type": "string",
             "minLength": 3,
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "john_doe"
           },
           "email": {
             "type": "string",
             "minLength": 3,
             "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "example": "john.doe@aerodb.net"
           },
           "password": {
             "type": "string",
             "minLength": 8,
-            "maxLength": 100
+            "maxLength": 100,
+            "example": "pA$$w0rd123"
           }
         }
       },
@@ -1050,11 +1056,13 @@
         "properties": {
           "token": {
             "type": "string",
-            "description": "JWT token"
+            "description": "JWT token",
+            "example": "adb_jwt_token"
           },
           "refreshToken": {
             "type": "string",
-            "description": "Refresh token"
+            "description": "Refresh token",
+            "example": "adb_refresh_token"
           },
           "user": {
             "allOf": [
@@ -2083,43 +2091,39 @@
         "properties": {
           "id": {
             "type": "string",
+            "example": "123",
             "readOnly": true
           },
           "createdAt": {
             "type": "string",
             "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
             "readOnly": true
           },
           "updatedAt": {
             "type": "string",
             "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
             "readOnly": true
           },
           "username": {
             "type": "string",
             "minLength": 3,
-            "maxLength": 50
+            "maxLength": 50,
+            "example": "john_doe"
           },
           "email": {
             "type": "string",
             "minLength": 3,
             "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$"
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "example": "john.doe@aerodb.net"
           },
           "isVerified": {
             "type": "boolean",
+            "example": true,
             "readOnly": true
           }
-        },
-        "example": {
-          "id": "123",
-          "username": "john_doe",
-          "email": "john.doe@aerodb.net",
-          "createdAt": "2020-01-01T00:00:00Z",
-          "updatedAt": "2020-01-01T00:00:00Z",
-          "isVerified": true,
-          "verificationDate": "2020-01-01T00:00:00Z",
-          "lastSeen": "2020-01-01T00:00:00Z"
         }
       },
       "ValidationError": {

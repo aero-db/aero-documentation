@@ -42,8 +42,8 @@ export default defineConfig({
     },
     
     nav: [ 
-      { text: 'Airports', link: '/tags/Airports' },
-      { text: 'Notams', link: '/tags/Notams' },
+      { text: 'Airports', link: '/operations/Airports_list.html' },
+      { text: 'Notams', link: '/operations/Notams_list.html' },
       { text: 'Pricing', link: '/pricing' },
     ],
     search: {
