@@ -862,7 +862,12 @@
           "timezone",
           "facilityType",
           "isPrivate",
+          "isMilitary",
+          "isCivilian",
           "isClosed",
+          "isVFR",
+          "isIFR",
+          "pprRequired",
           "runways",
           "frequencies"
         ],
@@ -954,7 +959,9 @@
                 "$ref": "#/components/schemas/ContinentCode"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "description": "ISO 3166-1 continent code",
+            "example": "NA"
           },
           "timezone": {
             "type": "string",
@@ -977,9 +984,37 @@
             "nullable": true,
             "example": false
           },
+          "isMilitary": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isCivilian": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
           "isClosed": {
             "type": "boolean",
             "nullable": true,
+            "example": false
+          },
+          "isVFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
+            "example": false
+          },
+          "isIFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
+            "example": false
+          },
+          "pprRequired": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if prior permission is required for landing",
             "example": false
           },
           "runways": {
@@ -1212,13 +1247,9 @@
         "type": "string",
         "enum": [
           "airport",
-          "heliport",
-          "seaplaneBase",
-          "balloonport",
-          "ultralight",
-          "gliderport",
-          "stolport",
-          "other"
+          "internationalAirport",
+          "airfield",
+          "heliport"
         ],
         "description": "A type of facility"
       },
@@ -1428,7 +1459,12 @@
           "timezone",
           "facilityType",
           "isPrivate",
+          "isMilitary",
+          "isCivilian",
           "isClosed",
+          "isVFR",
+          "isIFR",
+          "pprRequired",
           "runways",
           "frequencies"
         ],
@@ -1518,7 +1554,9 @@
                 "$ref": "#/components/schemas/ContinentCode"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "description": "ISO 3166-1 continent code",
+            "example": "NA"
           },
           "timezone": {
             "type": "string",
@@ -1541,9 +1579,37 @@
             "nullable": true,
             "example": false
           },
+          "isMilitary": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isCivilian": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
           "isClosed": {
             "type": "boolean",
             "nullable": true,
+            "example": false
+          },
+          "isVFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
+            "example": false
+          },
+          "isIFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
+            "example": false
+          },
+          "pprRequired": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if prior permission is required for landing",
             "example": false
           },
           "runways": {
@@ -1623,7 +1689,12 @@
           "timezone",
           "facilityType",
           "isPrivate",
-          "isClosed"
+          "isMilitary",
+          "isCivilian",
+          "isClosed",
+          "isVFR",
+          "isIFR",
+          "pprRequired"
         ],
         "properties": {
           "id": {
@@ -1711,7 +1782,9 @@
                 "$ref": "#/components/schemas/ContinentCode"
               }
             ],
-            "nullable": true
+            "nullable": true,
+            "description": "ISO 3166-1 continent code",
+            "example": "NA"
           },
           "timezone": {
             "type": "string",
@@ -1734,9 +1807,37 @@
             "nullable": true,
             "example": false
           },
+          "isMilitary": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isCivilian": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
           "isClosed": {
             "type": "boolean",
             "nullable": true,
+            "example": false
+          },
+          "isVFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
+            "example": false
+          },
+          "isIFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
+            "example": false
+          },
+          "pprRequired": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if prior permission is required for landing",
             "example": false
           }
         },
