@@ -842,207 +842,19 @@
       }
     },
     "schemas": {
-      "Airport": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "icaoCode",
-          "iataCode",
-          "localCode",
-          "latitude",
-          "longitude",
-          "elevation",
-          "countryCode",
-          "city",
-          "state",
-          "county",
-          "continentCode",
-          "timezone",
-          "facilityType",
-          "isPrivate",
-          "isMilitary",
-          "isCivilian",
-          "isClosed",
-          "isVFR",
-          "isIFR",
-          "pprRequired",
-          "runways",
-          "frequencies"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the airport",
-            "example": "0000-ffff-0000-ffff",
-            "readOnly": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 200,
-            "example": "Hartsfield–Jackson Atlanta International Airport"
-          },
-          "icaoCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z0-9]{4}$",
-            "description": "ICAO airport code, a four-letter alphanumeric code",
-            "example": "KATL"
-          },
-          "iataCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z0-9]{3}$",
-            "description": "IATA airport code, a three-letter alphanumeric code",
-            "example": "ATL"
-          },
-          "localCode": {
-            "type": "string",
-            "nullable": true,
-            "example": "ATL"
-          },
-          "latitude": {
-            "type": "number",
-            "nullable": true,
-            "example": 33.6407
-          },
-          "longitude": {
-            "type": "number",
-            "nullable": true,
-            "example": -84.4277
-          },
-          "elevation": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 1026
-          },
-          "countryCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z]{2}$",
-            "description": "ISO 3166-1 alpha-2 country code",
-            "example": "US"
-          },
-          "city": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 50,
-            "example": "Atlanta"
-          },
-          "state": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 50,
-            "example": "Georgia"
-          },
-          "county": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 50,
-            "example": "Fulton"
-          },
-          "continentCode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ContinentCode"
-              }
-            ],
-            "nullable": true,
-            "description": "ISO 3166-1 continent code",
-            "example": "NA"
-          },
-          "timezone": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 100,
-            "example": "America/New_York"
-          },
-          "facilityType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FACILITY_TYPE"
-              }
-            ],
-            "nullable": true,
-            "example": "airport"
-          },
-          "isPrivate": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isMilitary": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isCivilian": {
-            "type": "boolean",
-            "nullable": true,
-            "example": true
-          },
-          "isClosed": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isVFR": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
-            "example": false
-          },
-          "isIFR": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
-            "example": false
-          },
-          "pprRequired": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if prior permission is required for landing",
-            "example": false
-          },
-          "runways": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Runway"
-            }
-          },
-          "frequencies": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Frequency"
-            }
-          }
-        }
-      },
       "AuthLogin": {
         "type": "object",
         "required": [
-          "username",
+          "email",
           "password"
         ],
         "properties": {
-          "username": {
+          "email": {
             "type": "string",
             "minLength": 3,
-            "maxLength": 50,
-            "example": "john_doe"
+            "maxLength": 100,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "example": "john.doe@aerodb.net"
           },
           "password": {
             "type": "string",
@@ -1069,7 +881,7 @@
           "email": {
             "type": "string",
             "minLength": 3,
-            "maxLength": 50,
+            "maxLength": 100,
             "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
             "example": "john.doe@aerodb.net"
           },
@@ -1252,50 +1064,6 @@
           "heliport"
         ],
         "description": "A type of facility"
-      },
-      "Frequency": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "type",
-          "description",
-          "frequency"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the Frequency",
-            "example": "0000-ffff-0000-ffff",
-            "readOnly": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "example": "Tower Control"
-          },
-          "type": {
-            "type": "string",
-            "nullable": true,
-            "example": "Tower"
-          },
-          "description": {
-            "type": "string",
-            "nullable": true,
-            "example": "Tower Control Frequency"
-          },
-          "frequency": {
-            "type": "number",
-            "format": "float",
-            "example": 118.83
-          }
-        }
       },
       "NotFoundError": {
         "type": "object",
@@ -1975,140 +1743,6 @@
           }
         }
       },
-      "Runway": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "length",
-          "width",
-          "isClosed",
-          "isLighted",
-          "lowEndIdent",
-          "lowEndElevation",
-          "lowEndHeading",
-          "lowEndDisplacedThreshold",
-          "lowEndLatitude",
-          "lowEndLongitude",
-          "highEndIdent",
-          "highEndElevation",
-          "highEndHeading",
-          "highEndDisplacedThreshold",
-          "highEndLatitude",
-          "highEndLongitude"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the Runway",
-            "example": "0000-ffff-0000-ffff",
-            "readOnly": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "example": "Runway 4/22"
-          },
-          "length": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 3500
-          },
-          "width": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 75
-          },
-          "isClosed": {
-            "type": "boolean",
-            "nullable": true,
-            "example": true
-          },
-          "isLighted": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "lowEndIdent": {
-            "type": "string",
-            "nullable": true,
-            "example": "4"
-          },
-          "lowEndElevation": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 50
-          },
-          "lowEndHeading": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 40
-          },
-          "lowEndDisplacedThreshold": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 50
-          },
-          "lowEndLatitude": {
-            "type": "number",
-            "format": "float",
-            "nullable": true,
-            "example": 40.7128
-          },
-          "lowEndLongitude": {
-            "type": "number",
-            "format": "float",
-            "nullable": true,
-            "example": -74.006
-          },
-          "highEndIdent": {
-            "type": "string",
-            "nullable": true,
-            "example": "22"
-          },
-          "highEndElevation": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 50
-          },
-          "highEndHeading": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 220
-          },
-          "highEndDisplacedThreshold": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 25
-          },
-          "highEndLatitude": {
-            "type": "number",
-            "format": "float",
-            "nullable": true,
-            "example": 40.7128
-          },
-          "highEndLongitude": {
-            "type": "number",
-            "format": "float",
-            "nullable": true,
-            "example": -74.006
-          }
-        }
-      },
       "SearchResult": {
         "type": "object",
         "required": [
@@ -2116,10 +1750,33 @@
         ],
         "properties": {
           "airports": {
-            "type": "array",
-            "items": {
-              "$ref": "#/components/schemas/Airport"
-            }
+            "type": "object",
+            "required": [
+              "count",
+              "totalCount",
+              "items"
+            ],
+            "properties": {
+              "count": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Number of items returned",
+                "example": 10
+              },
+              "totalCount": {
+                "type": "integer",
+                "format": "int32",
+                "description": "Total number of items available",
+                "example": 100
+              },
+              "items": {
+                "type": "array",
+                "items": {
+                  "$ref": "#/components/schemas/ReadListAirport"
+                }
+              }
+            },
+            "description": "Represents a paginated list of items."
           }
         }
       },
