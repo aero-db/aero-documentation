@@ -1750,33 +1750,10 @@
         ],
         "properties": {
           "airports": {
-            "type": "object",
-            "required": [
-              "count",
-              "totalCount",
-              "items"
-            ],
-            "properties": {
-              "count": {
-                "type": "integer",
-                "format": "int32",
-                "description": "Number of items returned",
-                "example": 10
-              },
-              "totalCount": {
-                "type": "integer",
-                "format": "int32",
-                "description": "Total number of items available",
-                "example": 100
-              },
-              "items": {
-                "type": "array",
-                "items": {
-                  "$ref": "#/components/schemas/ReadListAirport"
-                }
-              }
-            },
-            "description": "Represents a paginated list of items."
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadListAirport"
+            }
           }
         }
       },
