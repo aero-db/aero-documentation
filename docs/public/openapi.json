@@ -11,7 +11,7 @@
       "name": "Airports"
     },
     {
-      "name": "Users"
+      "name": "Account"
     },
     {
       "name": "Countries"
@@ -320,7 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/ReadUser"
                 }
               }
             }
@@ -623,118 +623,6 @@
         }
       }
     },
-    "/users": {
-      "get": {
-        "operationId": "Users_list",
-        "summary": "List users",
-        "parameters": [
-          {
-            "$ref": "#/components/parameters/ListParameters.limit"
-          },
-          {
-            "$ref": "#/components/parameters/ListParameters.page"
-          },
-          {
-            "$ref": "#/components/parameters/ListParameters.filter"
-          },
-          {
-            "$ref": "#/components/parameters/ListParameters.sort"
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "type": "object",
-                  "required": [
-                    "count",
-                    "totalCount",
-                    "items"
-                  ],
-                  "properties": {
-                    "count": {
-                      "type": "integer",
-                      "format": "int32",
-                      "description": "Number of items returned",
-                      "example": 10
-                    },
-                    "totalCount": {
-                      "type": "integer",
-                      "format": "int32",
-                      "description": "Total number of items available",
-                      "example": 100
-                    },
-                    "items": {
-                      "type": "array",
-                      "items": {
-                        "$ref": "#/components/schemas/User"
-                      }
-                    }
-                  },
-                  "description": "Represents a paginated list of items."
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Users"
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/users/{userId}": {
-      "get": {
-        "operationId": "Users_get",
-        "summary": "Get one user",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/User"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The server cannot find the requested resource.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Users"
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
     "/users/{userId}/refreshApiKey": {
       "post": {
         "operationId": "Users_refresh",
@@ -755,7 +643,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/User"
+                  "$ref": "#/components/schemas/ReadUser"
                 }
               }
             }
@@ -772,7 +660,7 @@
           }
         },
         "tags": [
-          "Users"
+          "Account"
         ],
         "security": [
           {
@@ -1743,6 +1631,58 @@
           }
         }
       },
+      "ReadUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "username",
+          "email",
+          "isVerified",
+          "apiKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
+            "example": "john.doe@aerodb.net"
+          },
+          "isVerified": {
+            "type": "boolean",
+            "example": true
+          },
+          "apiKey": {
+            "type": "string",
+            "pattern": "^adb[a-zA-Z0-9]{29}$",
+            "format": "password",
+            "example": "adb123456789012345678901234567890"
+          }
+        },
+        "description": ""
+      },
       "SearchResult": {
         "type": "object",
         "required": [
@@ -1819,7 +1759,8 @@
           "updatedAt",
           "username",
           "email",
-          "isVerified"
+          "isVerified",
+          "apiKey"
         ],
         "properties": {
           "id": {
@@ -1855,6 +1796,13 @@
           "isVerified": {
             "type": "boolean",
             "example": true,
+            "readOnly": true
+          },
+          "apiKey": {
+            "type": "string",
+            "pattern": "^adb[a-zA-Z0-9]{29}$",
+            "format": "password",
+            "example": "adb123456789012345678901234567890",
             "readOnly": true
           }
         }
