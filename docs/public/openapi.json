@@ -320,7 +320,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadUser"
+                  "$ref": "#/components/schemas/CurrentUser"
                 }
               }
             }
@@ -539,6 +539,98 @@
         }
       }
     },
+    "/requestResetPassword": {
+      "post": {
+        "operationId": "Auth_requestResetPassword",
+        "summary": "Request a password reset",
+        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestResetPassword"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/requestValidateEmail": {
+      "post": {
+        "operationId": "Auth_requestValidateEmail",
+        "summary": "Request an email verification",
+        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
     "/search": {
       "get": {
         "operationId": "Search_search",
@@ -623,6 +715,42 @@
         }
       }
     },
+    "/updatePassword": {
+      "post": {
+        "operationId": "Auth_updatePassword",
+        "summary": "Update the user password",
+        "description": "Update the user password using a valid reset token.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthUpdatePassword"
+              }
+            }
+          }
+        }
+      }
+    },
     "/users/{userId}/refreshApiKey": {
       "post": {
         "operationId": "Users_refresh",
@@ -643,7 +771,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/ReadUser"
+                  "$ref": "#/components/schemas/CurrentUser"
                 }
               }
             }
@@ -667,6 +795,42 @@
             "ApiKeyAuth": []
           }
         ]
+      }
+    },
+    "/validateEmail": {
+      "post": {
+        "operationId": "Auth_validateEmail",
+        "summary": "Verify the user account",
+        "description": "Verify the user account using the verification token sent via email.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthValidateEmail"
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -752,6 +916,18 @@
           }
         }
       },
+      "AuthRequestResetPassword": {
+        "type": "object",
+        "required": [
+          "email"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "readOnly": true
+          }
+        }
+      },
       "AuthSignup": {
         "type": "object",
         "required": [
@@ -781,6 +957,41 @@
           }
         }
       },
+      "AuthUpdatePassword": {
+        "type": "object",
+        "required": [
+          "newPassword",
+          "token"
+        ],
+        "properties": {
+          "newPassword": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 100,
+            "example": "pA$$w0rd123"
+          },
+          "token": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "123456789012345678901234567890"
+          }
+        }
+      },
+      "AuthValidateEmail": {
+        "type": "object",
+        "required": [
+          "token"
+        ],
+        "properties": {
+          "token": {
+            "type": "string",
+            "minLength": 32,
+            "maxLength": 32,
+            "example": "123456789012345678901234567890"
+          }
+        }
+      },
       "AuthenticationResult": {
         "type": "object",
         "required": [
@@ -802,7 +1013,7 @@
           "user": {
             "allOf": [
               {
-                "$ref": "#/components/schemas/User"
+                "$ref": "#/components/schemas/ReadUser"
               }
             ],
             "description": "User object"
@@ -921,6 +1132,66 @@
           "code": "AD-07",
           "name": "Andorra la Vella"
         }
+      },
+      "CurrentUser": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "updatedAt",
+          "username",
+          "email",
+          "verificationDate",
+          "lastVerificationTokenSendDate",
+          "apiKey"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "username": {
+            "type": "string",
+            "minLength": 3,
+            "maxLength": 50,
+            "description": "The user's username.",
+            "example": "john_doe"
+          },
+          "email": {
+            "type": "string",
+            "readOnly": true
+          },
+          "verificationDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "lastVerificationTokenSendDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "readOnly": true
+          },
+          "apiKey": {
+            "type": "string",
+            "readOnly": true
+          }
+        },
+        "description": "User as visible by it's owner's session (/me endpoint)."
       },
       "Error": {
         "type": "object",
@@ -1637,10 +1908,7 @@
           "id",
           "createdAt",
           "updatedAt",
-          "username",
-          "email",
-          "isVerified",
-          "apiKey"
+          "username"
         ],
         "properties": {
           "id": {
@@ -1661,24 +1929,8 @@
             "type": "string",
             "minLength": 3,
             "maxLength": 50,
+            "description": "The user's username.",
             "example": "john_doe"
-          },
-          "email": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            "example": "john.doe@aerodb.net"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": true
-          },
-          "apiKey": {
-            "type": "string",
-            "pattern": "^adb[a-zA-Z0-9]{29}$",
-            "format": "password",
-            "example": "adb123456789012345678901234567890"
           }
         },
         "description": ""
@@ -1726,6 +1978,31 @@
           }
         }
       },
+      "TooManyRequestsError": {
+        "type": "object",
+        "required": [
+          "statusCode",
+          "name",
+          "message"
+        ],
+        "properties": {
+          "statusCode": {
+            "type": "number",
+            "enum": [
+              429
+            ]
+          },
+          "name": {
+            "type": "string",
+            "enum": [
+              "Too Many Requests"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        }
+      },
       "UnauthorizedError": {
         "type": "object",
         "required": [
@@ -1748,62 +2025,6 @@
           },
           "message": {
             "type": "string"
-          }
-        }
-      },
-      "User": {
-        "type": "object",
-        "required": [
-          "id",
-          "createdAt",
-          "updatedAt",
-          "username",
-          "email",
-          "isVerified",
-          "apiKey"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "123",
-            "readOnly": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "username": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 50,
-            "example": "john_doe"
-          },
-          "email": {
-            "type": "string",
-            "minLength": 3,
-            "maxLength": 50,
-            "pattern": "^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\\.[a-zA-Z]{2,}$",
-            "example": "john.doe@aerodb.net"
-          },
-          "isVerified": {
-            "type": "boolean",
-            "example": true,
-            "readOnly": true
-          },
-          "apiKey": {
-            "type": "string",
-            "pattern": "^adb[a-zA-Z0-9]{29}$",
-            "format": "password",
-            "example": "adb123456789012345678901234567890",
-            "readOnly": true
           }
         }
       },
