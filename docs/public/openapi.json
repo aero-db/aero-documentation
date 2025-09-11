@@ -77,7 +77,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Airline"
+                        "$ref": "#/components/schemas/ReadAirlineItem"
                       }
                     }
                   },
@@ -118,7 +118,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Airline"
+                  "$ref": "#/components/schemas/ReadAirline"
                 }
               }
             }
@@ -520,7 +520,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/Notam"
+                        "$ref": "#/components/schemas/ReadNotamItem"
                       }
                     }
                   },
@@ -561,7 +561,7 @@
             "content": {
               "application/json": {
                 "schema": {
-                  "$ref": "#/components/schemas/Notam"
+                  "$ref": "#/components/schemas/ReadNotam"
                 }
               }
             }
@@ -1021,100 +1021,6 @@
       }
     },
     "schemas": {
-      "Airline": {
-        "type": "object",
-        "required": [
-          "id",
-          "createdAt",
-          "name",
-          "icao",
-          "iata",
-          "callsign",
-          "websiteUrl",
-          "countryCode",
-          "fleetSize",
-          "operationStartDate",
-          "operationEndDate"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000",
-            "readOnly": true
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z",
-            "readOnly": true
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100,
-            "description": "The airline's name.",
-            "example": "Air France"
-          },
-          "icao": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 3,
-            "maxLength": 4,
-            "description": "The airline's ICAO code.",
-            "example": "AFR"
-          },
-          "iata": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 3,
-            "description": "The airline's IATA code.",
-            "example": "AF"
-          },
-          "callsign": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "The airline's callsign.",
-            "example": "AIRFRANS"
-          },
-          "websiteUrl": {
-            "type": "string",
-            "nullable": true,
-            "maxLength": 200,
-            "description": "The airline's website URL.",
-            "example": "https://www.airfrance.com"
-          },
-          "countryCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 2,
-            "description": "ISO 3166-1 alpha-2 country code of the airline's primary country.",
-            "example": "FR"
-          },
-          "fleetSize": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "description": "Number of aircraft in the airline's fleet.",
-            "example": 150
-          },
-          "operationStartDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "description": "Date when the airline started operations."
-          },
-          "operationEndDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "description": "Date when the airline ceased operations."
-          }
-        }
-      },
       "AuthLogin": {
         "type": "object",
         "required": [
@@ -1470,122 +1376,191 @@
           }
         }
       },
-      "Notam": {
+      "ReadAirline": {
         "type": "object",
         "required": [
           "id",
-          "updatedAt",
-          "notamId",
-          "message",
-          "transactionId",
+          "createdAt",
+          "name",
           "icao",
-          "issueDate",
-          "startDate",
-          "endDate",
-          "canceledDate",
-          "source",
-          "sourceType",
-          "mapPointer",
-          "geometry",
-          "isSnowtam",
-          "isProcedure"
+          "iata",
+          "callsign",
+          "websiteUrl",
+          "countryCode",
+          "fleetSize",
+          "operationStartDate",
+          "operationEndDate"
         ],
         "properties": {
           "id": {
             "type": "string",
-            "description": "UUID of the notam",
-            "readOnly": true
+            "example": "123e4567-e89b-12d3-a456-426614174000"
           },
-          "updatedAt": {
+          "createdAt": {
             "type": "string",
             "format": "date-time",
-            "readOnly": true
+            "example": "2020-01-01T00:00:00Z"
           },
-          "notamId": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
+          "name": {
             "type": "string",
             "minLength": 1,
-            "maxLength": 3000,
-            "description": "The NOTAM message text."
-          },
-          "transactionId": {
-            "type": "string",
-            "nullable": true
+            "maxLength": 100,
+            "description": "The airline's name.",
+            "example": "Air France"
           },
           "icao": {
             "type": "string",
             "nullable": true,
-            "pattern": "^[A-Z]{4}$"
+            "minLength": 3,
+            "maxLength": 4,
+            "description": "The airline's ICAO code.",
+            "example": "AFR"
           },
-          "issueDate": {
+          "iata": {
             "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "canceledDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "source": {
-            "type": "string",
-            "nullable": true
-          },
-          "sourceType": {
-            "type": "string",
-            "nullable": true
-          },
-          "mapPointer": {
-            "type": "string",
-            "nullable": true
-          },
-          "geometry": {
-            "type": "string",
-            "nullable": true
-          },
-          "isSnowtam": {
-            "type": "boolean",
             "nullable": true,
-            "description": "Indicates if the NOTAM is a SNOWTAM.\nA SNOWTAM (Snow and/or Ice NOTAM) is a special type of NOTAM (Notice to Airmen) issued by an airport to provide pilots with critical information about hazardous conditions on the movement area (runways and taxiways) caused by snow, ice, slush, frost, or standing water"
+            "minLength": 2,
+            "maxLength": 3,
+            "description": "The airline's IATA code.",
+            "example": "AF"
           },
-          "isProcedure": {
-            "type": "boolean",
+          "callsign": {
+            "type": "string",
             "nullable": true,
-            "description": "Indicates if the NOTAM is related to a procedure."
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The airline's callsign.",
+            "example": "AIRFRANS"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "The airline's website URL.",
+            "example": "https://www.airfrance.com"
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "ISO 3166-1 alpha-2 country code of the airline's primary country.",
+            "example": "FR"
+          },
+          "fleetSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Number of aircraft in the airline's fleet.",
+            "example": 150
+          },
+          "operationStartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline started operations."
+          },
+          "operationEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline ceased operations."
           }
         },
-        "example": {
-          "id": "67155d167139c42577c75279",
-          "notamId": "A0611/24",
-          "message": "A0611/24 NOTAMN\n    Q) LSAS/QFATT/IV/BO/A/000/999/4614N00607E005\n    A) LSGG B) 2410310000 C) 2411132359\n    E) TRIGGER NOTAM - PERM AIRAC AMDT 010/2024:\n    MAG VAR REVISED. \n    RDO NAV AND LDG AIDS GLA, GVA AND SPR DELETED AND PAS, LOC 22, \n    DME 22 AND LOC 04 REVISED. \n    FLT PROC SPECIAL REGULATION FOR GENEVA TMA/CTR REVISED. \n    SEVERAL SID AND STAR REVISED. \n    ADC, AOC AND ARC REVISED.\n    IAC SRA RWY 04 AND IAC SRA RWY 22 WITHDRAWN. \n    SEVERAL IAC REVISED.",
-          "transactionId": "73707264",
-          "icao": "LSGG",
-          "issueDate": "2024-09-19T04:00:00.000+00:00",
-          "startDate": "2024-09-19T04:00:00.000+00:00",
-          "endDate": "2024-09-19T04:00:00.000+00:00",
-          "source": "USNS",
-          "sourceType": "I",
-          "mapPointer": "POINT(6.10895 46.23806389)",
-          "geometry": "POINT(5105901.28612306 4966695.40062213)",
-          "createdAt": "2024-09-19T04:00:00.000+00:00",
-          "updatedAt": "2024-09-19T04:00:00.000+00:00",
-          "canceledDate": null,
-          "isSnowtam": false,
-          "isProcedure": false
-        }
+        "description": ""
+      },
+      "ReadAirlineItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "name",
+          "icao",
+          "iata",
+          "callsign",
+          "websiteUrl",
+          "countryCode",
+          "fleetSize",
+          "operationStartDate",
+          "operationEndDate"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "The airline's name.",
+            "example": "Air France"
+          },
+          "icao": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 3,
+            "maxLength": 4,
+            "description": "The airline's ICAO code.",
+            "example": "AFR"
+          },
+          "iata": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 3,
+            "description": "The airline's IATA code.",
+            "example": "AF"
+          },
+          "callsign": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The airline's callsign.",
+            "example": "AIRFRANS"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "The airline's website URL.",
+            "example": "https://www.airfrance.com"
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "ISO 3166-1 alpha-2 country code of the airline's primary country.",
+            "example": "FR"
+          },
+          "fleetSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Number of aircraft in the airline's fleet.",
+            "example": 150
+          },
+          "operationStartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline started operations."
+          },
+          "operationEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline ceased operations."
+          }
+        },
+        "description": ""
       },
       "ReadAirport": {
         "type": "object",
@@ -1987,6 +1962,200 @@
             "nullable": true,
             "description": "Indicates if prior permission is required for landing",
             "example": false
+          }
+        },
+        "description": ""
+      },
+      "ReadNotam": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "notamId",
+          "message",
+          "transactionId",
+          "icao",
+          "issueDate",
+          "startDate",
+          "endDate",
+          "canceledDate",
+          "source",
+          "sourceType",
+          "mapPointer",
+          "geometry",
+          "isSnowtam",
+          "isProcedure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the notam"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000,
+            "description": "The NOTAM message text."
+          },
+          "transactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "icao": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{4}$"
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canceledDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "mapPointer": {
+            "type": "string",
+            "nullable": true
+          },
+          "geometry": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSnowtam": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is a SNOWTAM.\nA SNOWTAM (Snow and/or Ice NOTAM) is a special type of NOTAM (Notice to Airmen) issued by an airport to provide pilots with critical information about hazardous conditions on the movement area (runways and taxiways) caused by snow, ice, slush, frost, or standing water"
+          },
+          "isProcedure": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is related to a procedure."
+          }
+        },
+        "description": ""
+      },
+      "ReadNotamItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "notamId",
+          "message",
+          "transactionId",
+          "icao",
+          "issueDate",
+          "startDate",
+          "endDate",
+          "canceledDate",
+          "source",
+          "sourceType",
+          "mapPointer",
+          "geometry",
+          "isSnowtam",
+          "isProcedure"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the notam"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "notamId": {
+            "type": "string",
+            "nullable": true
+          },
+          "message": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3000,
+            "description": "The NOTAM message text."
+          },
+          "transactionId": {
+            "type": "string",
+            "nullable": true
+          },
+          "icao": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{4}$"
+          },
+          "issueDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "startDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "endDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "canceledDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true
+          },
+          "source": {
+            "type": "string",
+            "nullable": true
+          },
+          "sourceType": {
+            "type": "string",
+            "nullable": true
+          },
+          "mapPointer": {
+            "type": "string",
+            "nullable": true
+          },
+          "geometry": {
+            "type": "string",
+            "nullable": true
+          },
+          "isSnowtam": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is a SNOWTAM.\nA SNOWTAM (Snow and/or Ice NOTAM) is a special type of NOTAM (Notice to Airmen) issued by an airport to provide pilots with critical information about hazardous conditions on the movement area (runways and taxiways) caused by snow, ice, slush, frost, or standing water"
+          },
+          "isProcedure": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the NOTAM is related to a procedure."
           }
         },
         "description": ""
