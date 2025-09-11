@@ -11,22 +11,139 @@
       "name": "Airports"
     },
     {
-      "name": "Account"
+      "name": "Notams"
+    },
+    {
+      "name": "Airlines"
     },
     {
       "name": "Countries"
     },
     {
-      "name": "Notams"
+      "name": "Search"
     },
     {
       "name": "Authentication"
     },
     {
-      "name": "Search"
+      "name": "Account"
     }
   ],
   "paths": {
+    "/airlines": {
+      "get": {
+        "operationId": "Airlines_list",
+        "summary": "List Airlines",
+        "description": "Return a list of Airlines\n\nIf unauthenticated, the result is limited to 5 items.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.page"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/Airline"
+                      }
+                    }
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airlines"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/airlines/{airlineId}": {
+      "get": {
+        "operationId": "Airlines_get",
+        "summary": "Get one Airline",
+        "description": "Return one Airline",
+        "parameters": [
+          {
+            "name": "airlineId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Airline"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airlines"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
     "/airports": {
       "get": {
         "operationId": "Airports_list",
@@ -539,98 +656,6 @@
         }
       }
     },
-    "/requestResetPassword": {
-      "post": {
-        "operationId": "Auth_requestResetPassword",
-        "summary": "Request a password reset",
-        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Authentication"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthRequestResetPassword"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/requestValidateEmail": {
-      "post": {
-        "operationId": "Auth_requestValidateEmail",
-        "summary": "Request an email verification",
-        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Authentication"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
     "/search": {
       "get": {
         "operationId": "Search_search",
@@ -715,9 +740,101 @@
         }
       }
     },
-    "/updatePassword": {
+    "/users/requestResetPassword": {
       "post": {
-        "operationId": "Auth_updatePassword",
+        "operationId": "Account_requestResetPassword",
+        "summary": "Request a password reset",
+        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestResetPassword"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/requestValidateEmail": {
+      "post": {
+        "operationId": "Account_requestValidateEmail",
+        "summary": "Request an email verification",
+        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/users/updatePassword": {
+      "post": {
+        "operationId": "Account_updatePassword",
         "summary": "Update the user password",
         "description": "Update the user password using a valid reset token.",
         "parameters": [],
@@ -737,7 +854,7 @@
           }
         },
         "tags": [
-          "Authentication"
+          "Account"
         ],
         "requestBody": {
           "required": true,
@@ -748,12 +865,58 @@
               }
             }
           }
-        }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/users/validateEmail": {
+      "post": {
+        "operationId": "Account_validateEmail",
+        "summary": "Verify the user account",
+        "description": "Verify the user account using the verification token sent via email.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthValidateEmail"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
       }
     },
     "/users/{userId}/refreshApiKey": {
       "post": {
-        "operationId": "Users_refresh",
+        "operationId": "Account_refresh",
         "summary": "Refresh API key",
         "parameters": [
           {
@@ -795,42 +958,6 @@
             "ApiKeyAuth": []
           }
         ]
-      }
-    },
-    "/validateEmail": {
-      "post": {
-        "operationId": "Auth_validateEmail",
-        "summary": "Verify the user account",
-        "description": "Verify the user account using the verification token sent via email.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Authentication"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthValidateEmail"
-              }
-            }
-          }
-        }
       }
     }
   },
@@ -894,6 +1021,100 @@
       }
     },
     "schemas": {
+      "Airline": {
+        "type": "object",
+        "required": [
+          "id",
+          "createdAt",
+          "name",
+          "icao",
+          "iata",
+          "callsign",
+          "websiteUrl",
+          "countryCode",
+          "fleetSize",
+          "operationStartDate",
+          "operationEndDate"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "example": "123e4567-e89b-12d3-a456-426614174000",
+            "readOnly": true
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z",
+            "readOnly": true
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 100,
+            "description": "The airline's name.",
+            "example": "Air France"
+          },
+          "icao": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 3,
+            "maxLength": 4,
+            "description": "The airline's ICAO code.",
+            "example": "AFR"
+          },
+          "iata": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 3,
+            "description": "The airline's IATA code.",
+            "example": "AF"
+          },
+          "callsign": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "description": "The airline's callsign.",
+            "example": "AIRFRANS"
+          },
+          "websiteUrl": {
+            "type": "string",
+            "nullable": true,
+            "maxLength": 200,
+            "description": "The airline's website URL.",
+            "example": "https://www.airfrance.com"
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 2,
+            "description": "ISO 3166-1 alpha-2 country code of the airline's primary country.",
+            "example": "FR"
+          },
+          "fleetSize": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Number of aircraft in the airline's fleet.",
+            "example": 150
+          },
+          "operationStartDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline started operations."
+          },
+          "operationEndDate": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "Date when the airline ceased operations."
+          }
+        }
+      },
       "AuthLogin": {
         "type": "object",
         "required": [
