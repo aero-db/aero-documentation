@@ -1,55 +1,71 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <svg
-   width="32"
-   height="32"
+   width="96"
+   height="96"
+   viewBox="0 0 480 480"
    version="1.1"
    id="svg1"
-   sodipodi:docname="svg.svg"
+   sodipodi:docname="icon.svg"
    inkscape:version="1.3.2 (091e20e, 2023-11-25, custom)"
    xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
    xmlns="http://www.w3.org/2000/svg"
    xmlns:svg="http://www.w3.org/2000/svg">
-  <defs
-     id="defs1">
-     <linearGradient id="brandGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-       <stop offset="0%" stop-color="#747bff" />
-       <stop offset="100%" stop-color="#a855f7" />
-     </linearGradient>
-  </defs>
   <sodipodi:namedview
      id="namedview1"
-     pagecolor="#ffffff"
+     pagecolor="#0d0d0d"
      bordercolor="#000000"
-     borderopacity="0.25"
+     borderopacity="0.24705882"
      inkscape:showpageshadow="2"
      inkscape:pageopacity="0.0"
      inkscape:pagecheckerboard="0"
      inkscape:deskcolor="#d1d1d1"
-     inkscape:zoom="11.313709"
-     inkscape:cx="16.440232"
-     inkscape:cy="10.120465"
+     showgrid="true"
+     inkscape:export-bgcolor="#00000000"
+     inkscape:lockguides="true"
+     inkscape:zoom="6.4094527"
+     inkscape:cx="50.082279"
+     inkscape:cy="39.550959"
      inkscape:window-width="1920"
      inkscape:window-height="1009"
      inkscape:window-x="-8"
      inkscape:window-y="-8"
      inkscape:window-maximized="1"
-     inkscape:current-layer="g1" />
-  <g
-     id="g1">
-    <title
-       id="title1">Layer 1</title>
-    <path
-       fill="url(#brandGradient)"
-       d="m24.08875,7.9075c0.59,0.59 0.59,1.54 0,2.12l-3.89,3.89l2.12,9.19l-1.41,1.42l-3.88,-7.43l-3.9,3.9l0.36,2.47l-1.07,1.06l-1.76,-3.18l-3.19,-1.77l1.06,-1.08l2.5,0.37l3.87,-3.87l-7.43,-3.91l1.42,-1.41l9.19,2.12l3.89,-3.89c0.56,-0.58 1.56,-0.58 2.12,0"
-       id="svg_1" />
-    <path
-       stroke="null"
-       id="svg_6"
-       d="m 15.99682,0.00558 c -8.79922,0 -15.9322,7.15828 -15.9322,15.9887 0,8.83042 7.13299,15.9887 15.9322,15.9887 8.79922,0 15.9322,-7.15828 15.9322,-15.9887 0,-8.83042 -7.13299,-15.9887 -15.9322,-15.9887 z m 0,28.67603 c -6.97294,0 -12.6436,-5.69186 -12.6436,-12.68733 0,-6.99657 5.67065,-12.68843 12.6436,-12.68843 6.97294,0 12.6425,5.69076 12.6425,12.68843 0,6.99767 -5.67175,12.68733 -12.6425,12.68733 z"
-       stroke-width="5"
-       fill="url(#brandGradient)"
-       inkscape:label="svg_6"
-       sodipodi:nodetypes="ssssssssss" />
-  </g>
+     inkscape:current-layer="svg1">
+    <inkscape:grid
+       id="grid1"
+       units="px"
+       originx="0"
+       originy="0"
+       spacingx="5.6888889"
+       spacingy="5.6888889"
+       empcolor="#0099e5"
+       empopacity="0.30196078"
+       color="#0099e5"
+       opacity="0.14901961"
+       empspacing="5"
+       dotted="false"
+       gridanglex="30"
+       gridanglez="30"
+       visible="true" />
+  </sodipodi:namedview>
+  <defs
+     id="defs1" />
+  <polygon
+     points="398,731 270,512 398,293 654,293 782,512 654,731 "
+     fill="none"
+     stroke="#ffffff"
+     stroke-width="96"
+     stroke-linejoin="round"
+     stroke-linecap="round"
+     id="polygon1"
+     transform="matrix(0.64270679,0,0,0.64270679,-100.66926,-86.82899)"
+     style="stroke-width:72.2489;stroke-linecap:butt;stroke-linejoin:round;stroke-miterlimit:5.9;stroke-dasharray:none;paint-order:normal" />
+  <circle
+     cx="238.40704"
+     cy="241.90704"
+     fill="#FFFFFF"
+     id="circle1"
+     style="fill:#ffffff;stroke-width:16.9358;stroke-dasharray:none"
+     r="32.5" />
 </svg>
