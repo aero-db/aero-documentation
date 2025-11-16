@@ -2,9 +2,9 @@
   "openapi": "3.0.0",
   "info": {
     "title": "AeroDB API",
-    "version": "1.0.0",
-    "summary": "AeroDB API provides access to airport, user, country, and NOTAM data.",
-    "description": "This is the AeroDB API, providing a large scale of various aeronautical data.\n\n\nAll properties are always returned and must be provided but can be null if not applicable.\nSome endpoints require authentication via API key.\n\n## Filtering, Sorting, and Pagination\n\nSome operations allow you to filter, sort, and paginate results.\n\nExample:\n\n```json\n/airports?filter={\"name\":\"Geneva\",\"countryCode\":\"CH\"}&limit=10&page=2\n```\n\n*Results are limited to **100** items by default, this limit can be increased to 300 items per page.*\n\n\n## Rate Limiting\n\nThis API use an IP address rate limit of around 10 queries /sec.\n\nReaching this rate limit will result in a 429 Too Many Requests response.\n\nYou can use the `X-Ratelimit-Limit` `X-Ratelimit-Reset-Ms` and `X-Ratelimit-Remaining` headers to check your current rate limit status."
+    "version": "1.0.10",
+    "summary": "The AeroDB API provides access to a wide range of aeronautical data.",
+    "description": "## General Information\n\n- All properties are **always returned** and **must be provided**,\nbut can be `null` if not applicable.\n- Some endpoints require **authentication via API key**.\n\n## Filtering, Sorting & Offset\n\nCertain endpoints support **filtering**, **sorting**, and **offset** to control and refine list results.\n\n### Query Parameters\n\n| Parameter | Type | Default | Description |\n|------------|-------|----------|--------------|\n| `limit` | `int32` | `100` | Maximum number of items per page. Cannot exceed **300**. |\n| `offset` | `int32` | `0` | Number of items to skip before starting to collect results. |\n| `filter` | `string` (Base64) | — | Base64-encoded JSON object defining filtering conditions. |\n| `sort` | `string` (Base64) | — | Base64-encoded JSON object defining sorting order. |\n\n---\n\n### Filtering Example\n\nYou can filter airports by one or more properties using a **Base64-encoded JSON filter**.\n\n#### JSON before encoding:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n```\n\n#### Final request:\n> /airports?limit=50&offset=0&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n\n---\n\n### Sorting Example\n\nYou can define multiple sort rules, each specifying a property and direction (`asc` or `desc`).\n\n#### JSON before encoding:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n```\n\n#### Final request:\n> /airports?limit=20&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\n---\n\n### Combined Example\n\nYou can combine **filter**, **sort**, **limit**, and **offset** in a single request.\n\n> /airports?limit=100&offset=200&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\nThis will return up to **100 Spanish airports**, skipping the first **200**, sorted by **name (asc)** then **city (desc)**.\n\n---\n\n## Rate Limiting\n\n- The API enforces a per-IP rate limit of approximately **10 requests per second**.\n- Exceeding this limit returns a `429 Too Many Requests` response.\n\nUse these headers to monitor your current rate limit status:\n\n- `X-Ratelimit-Limit`\n- `X-Ratelimit-Remaining`\n- `X-Ratelimit-Reset-Ms`\n\n---\n\n© AeroDB — All rights reserved."
   },
   "tags": [
     {
@@ -27,9 +27,186 @@
     },
     {
       "name": "Account"
+    },
+    {
+      "name": "Users"
     }
   ],
   "paths": {
+    "/account/requestResetPassword": {
+      "post": {
+        "operationId": "Account_requestResetPassword",
+        "summary": "Request a password reset",
+        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthRequestResetPassword"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/account/requestValidateEmail": {
+      "post": {
+        "operationId": "Account_requestValidateEmail",
+        "summary": "Request an email verification",
+        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          },
+          "429": {
+            "description": "Client error",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TooManyRequestsError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "security": [
+          {
+            "BearerAuth": []
+          }
+        ]
+      }
+    },
+    "/account/updatePassword": {
+      "post": {
+        "operationId": "Account_updatePassword",
+        "summary": "Update the user password",
+        "description": "Update the user password using a valid reset token.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthUpdatePassword"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
+    "/account/validateEmail": {
+      "post": {
+        "operationId": "Account_validateEmail",
+        "summary": "Verify the user account",
+        "description": "Verify the user account using the verification token sent via email.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          },
+          "400": {
+            "description": "The server could not understand the request due to invalid syntax.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ValidationError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Account"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AuthValidateEmail"
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
+        ]
+      }
+    },
     "/airlines": {
       "get": {
         "operationId": "Airlines_list",
@@ -40,7 +217,7 @@
             "$ref": "#/components/parameters/ListParameters.limit"
           },
           {
-            "$ref": "#/components/parameters/ListParameters.page"
+            "$ref": "#/components/parameters/ListParameters.offset"
           },
           {
             "$ref": "#/components/parameters/ListParameters.filter"
@@ -153,7 +330,7 @@
             "$ref": "#/components/parameters/ListParameters.limit"
           },
           {
-            "$ref": "#/components/parameters/ListParameters.page"
+            "$ref": "#/components/parameters/ListParameters.offset"
           },
           {
             "$ref": "#/components/parameters/ListParameters.filter"
@@ -215,7 +392,7 @@
             "$ref": "#/components/parameters/UnlimitedListParameters"
           },
           {
-            "$ref": "#/components/parameters/ListParameters.page"
+            "$ref": "#/components/parameters/ListParameters.offset"
           },
           {
             "$ref": "#/components/parameters/ListParameters.filter"
@@ -290,7 +467,7 @@
             "$ref": "#/components/parameters/UnlimitedListParameters"
           },
           {
-            "$ref": "#/components/parameters/ListParameters.page"
+            "$ref": "#/components/parameters/ListParameters.offset"
           },
           {
             "$ref": "#/components/parameters/ListParameters.filter"
@@ -483,7 +660,7 @@
             "$ref": "#/components/parameters/ListParameters.limit"
           },
           {
-            "$ref": "#/components/parameters/ListParameters.page"
+            "$ref": "#/components/parameters/ListParameters.offset"
           },
           {
             "$ref": "#/components/parameters/ListParameters.filter"
@@ -585,6 +762,71 @@
             "ApiKeyAuth": []
           }
         ]
+      }
+    },
+    "/oauth/validateToken": {
+      "post": {
+        "operationId": "Auth_validateOAuthToken",
+        "summary": "Validate an OAuth token",
+        "description": "Return a user account based on a valid OAuth token from a provider based on the user's email.\n\nIf the user does not exist, a new account is created with a generated password.\n\nThe provider will be linked to the user account for future logins.\n\nReturn 404 if no user is found with the email provided by the OAuth provider.\n\nReturn 401 if the OAuth token is invalid or expired.",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthenticationResult"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Access is unauthorized.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UnauthorizedError"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/NotFoundError"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Authentication"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "type": "object",
+                "properties": {
+                  "provider": {
+                    "$ref": "#/components/schemas/OAuthProvider"
+                  },
+                  "token": {
+                    "type": "string"
+                  }
+                },
+                "required": [
+                  "provider",
+                  "token"
+                ]
+              }
+            }
+          }
+        }
       }
     },
     "/refreshToken": {
@@ -740,183 +982,9 @@
         }
       }
     },
-    "/users/requestResetPassword": {
-      "post": {
-        "operationId": "Account_requestResetPassword",
-        "summary": "Request a password reset",
-        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthRequestResetPassword"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/users/requestValidateEmail": {
-      "post": {
-        "operationId": "Account_requestValidateEmail",
-        "summary": "Request an email verification",
-        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/users/updatePassword": {
-      "post": {
-        "operationId": "Account_updatePassword",
-        "summary": "Update the user password",
-        "description": "Update the user password using a valid reset token.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthUpdatePassword"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/users/validateEmail": {
-      "post": {
-        "operationId": "Account_validateEmail",
-        "summary": "Verify the user account",
-        "description": "Verify the user account using the verification token sent via email.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthValidateEmail"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
     "/users/{userId}/refreshApiKey": {
       "post": {
-        "operationId": "Account_refresh",
+        "operationId": "Users_refresh",
         "summary": "Refresh API key",
         "parameters": [
           {
@@ -951,7 +1019,7 @@
           }
         },
         "tags": [
-          "Account"
+          "Users"
         ],
         "security": [
           {
@@ -967,7 +1035,7 @@
         "name": "filter",
         "in": "query",
         "required": false,
-        "description": "Stringified filter expression to apply to the list.",
+        "description": "Base64-encoded filter expression to apply to the list.",
         "schema": {
           "type": "string"
         },
@@ -986,15 +1054,15 @@
         },
         "explode": false
       },
-      "ListParameters.page": {
-        "name": "page",
+      "ListParameters.offset": {
+        "name": "offset",
         "in": "query",
         "required": false,
-        "description": "Page number to retrieve.",
+        "description": "Offset.",
         "schema": {
           "type": "integer",
           "format": "int32",
-          "default": 1
+          "default": 0
         },
         "explode": false
       },
@@ -1002,7 +1070,7 @@
         "name": "sort",
         "in": "query",
         "required": false,
-        "description": "Sort order for the list.",
+        "description": "Base64-encoded sort expression to apply to the list.",
         "schema": {
           "type": "string"
         },
@@ -1376,14 +1444,23 @@
           }
         }
       },
+      "OAuthProvider": {
+        "type": "string",
+        "enum": [
+          "google",
+          "github",
+          "apple"
+        ],
+        "description": "Supported OAuth providers"
+      },
       "ReadAirline": {
         "type": "object",
         "required": [
           "id",
           "createdAt",
           "name",
-          "icao",
-          "iata",
+          "icaoCode",
+          "iataCode",
           "callsign",
           "websiteUrl",
           "countryCode",
@@ -1408,7 +1485,7 @@
             "description": "The airline's name.",
             "example": "Air France"
           },
-          "icao": {
+          "icaoCode": {
             "type": "string",
             "nullable": true,
             "minLength": 3,
@@ -1416,7 +1493,7 @@
             "description": "The airline's ICAO code.",
             "example": "AFR"
           },
-          "iata": {
+          "iataCode": {
             "type": "string",
             "nullable": true,
             "minLength": 2,
@@ -1475,8 +1552,8 @@
           "id",
           "createdAt",
           "name",
-          "icao",
-          "iata",
+          "icaoCode",
+          "iataCode",
           "callsign",
           "websiteUrl",
           "countryCode",
@@ -1501,7 +1578,7 @@
             "description": "The airline's name.",
             "example": "Air France"
           },
-          "icao": {
+          "icaoCode": {
             "type": "string",
             "nullable": true,
             "minLength": 3,
@@ -1509,7 +1586,7 @@
             "description": "The airline's ICAO code.",
             "example": "AFR"
           },
-          "iata": {
+          "iataCode": {
             "type": "string",
             "nullable": true,
             "minLength": 2,
@@ -1610,7 +1687,6 @@
           },
           "icaoCode": {
             "type": "string",
-            "nullable": true,
             "pattern": "^[A-Z0-9]{4}$",
             "description": "ICAO airport code, a four-letter alphanumeric code",
             "example": "KATL"
@@ -1660,7 +1736,7 @@
           "state": {
             "type": "string",
             "nullable": true,
-            "minLength": 2,
+            "minLength": 1,
             "maxLength": 50,
             "example": "Georgia"
           },
@@ -1838,7 +1914,6 @@
           },
           "icaoCode": {
             "type": "string",
-            "nullable": true,
             "pattern": "^[A-Z0-9]{4}$",
             "description": "ICAO airport code, a four-letter alphanumeric code",
             "example": "KATL"
@@ -1888,7 +1963,7 @@
           "state": {
             "type": "string",
             "nullable": true,
-            "minLength": 2,
+            "minLength": 1,
             "maxLength": 50,
             "example": "Georgia"
           },
@@ -1974,7 +2049,7 @@
           "notamId",
           "message",
           "transactionId",
-          "icao",
+          "icaoCode",
           "issueDate",
           "startDate",
           "endDate",
@@ -2009,7 +2084,7 @@
             "type": "string",
             "nullable": true
           },
-          "icao": {
+          "icaoCode": {
             "type": "string",
             "nullable": true,
             "pattern": "^[A-Z]{4}$"
@@ -2071,7 +2146,7 @@
           "notamId",
           "message",
           "transactionId",
-          "icao",
+          "icaoCode",
           "issueDate",
           "startDate",
           "endDate",
@@ -2106,7 +2181,7 @@
             "type": "string",
             "nullable": true
           },
-          "icao": {
+          "icaoCode": {
             "type": "string",
             "nullable": true,
             "pattern": "^[A-Z]{4}$"
