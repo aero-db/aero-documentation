@@ -17,7 +17,7 @@ export default defineConfig({
   description: 'Explore the AeroDB API with ease',
   lastUpdated: true,
   head: [
-      ['link', { rel: 'icon', href: '/icon.svg' }],
+      ['link', { rel: 'icon', href: 'https://aerodb.net/icon.svg' }],
       [
         'script',
         {
@@ -38,8 +38,8 @@ export default defineConfig({
   themeConfig: {
     aside: "left",
     logo: {
-      src: '/icon.svg',
-      alt: 'AeroDB Logo',
+      src: 'https://aerodb.net/icon.svg',
+      alt: 'AeroDB Icon',
     },
     
     nav: [ 

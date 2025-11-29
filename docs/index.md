@@ -5,8 +5,8 @@ hero:
   name: "AeroDB"
   tagline: "Complete and simple source of aeronautical data"
   image: 
-    src: /icon.svg
-    alt: AeroDB Logo
+    src: https://aerodb.net/icon.svg
+    alt: AeroDB Icon
     width: 128
     height: 128
   actions:
