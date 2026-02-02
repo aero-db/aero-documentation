@@ -2,11 +2,14 @@
   "openapi": "3.0.0",
   "info": {
     "title": "AeroDB API",
-    "version": "1.0.10",
+    "version": "1.0.16",
     "summary": "The AeroDB API provides access to a wide range of aeronautical data.",
     "description": "## General Information\n\n- All properties are **always returned** and **must be provided**,\nbut can be `null` if not applicable.\n- Some endpoints require **authentication via API key**.\n\n## Filtering, Sorting & Offset\n\nCertain endpoints support **filtering**, **sorting**, and **offset** to control and refine list results.\n\n### Query Parameters\n\n| Parameter | Type | Default | Description |\n|------------|-------|----------|--------------|\n| `limit` | `int32` | `100` | Maximum number of items per page. Cannot exceed **300**. |\n| `offset` | `int32` | `0` | Number of items to skip before starting to collect results. |\n| `filter` | `string` (Base64) | — | Base64-encoded JSON object defining filtering conditions. |\n| `sort` | `string` (Base64) | — | Base64-encoded JSON object defining sorting order. |\n\n---\n\n### Filtering Example\n\nYou can filter airports by one or more properties using a **Base64-encoded JSON filter**.\n\n#### JSON before encoding:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n```\n\n#### Final request:\n> /airports?limit=50&offset=0&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n\n---\n\n### Sorting Example\n\nYou can define multiple sort rules, each specifying a property and direction (`asc` or `desc`).\n\n#### JSON before encoding:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n```\n\n#### Final request:\n> /airports?limit=20&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\n---\n\n### Combined Example\n\nYou can combine **filter**, **sort**, **limit**, and **offset** in a single request.\n\n> /airports?limit=100&offset=200&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\nThis will return up to **100 Spanish airports**, skipping the first **200**, sorted by **name (asc)** then **city (desc)**.\n\n---\n\n## Rate Limiting\n\n- The API enforces a per-IP rate limit of approximately **10 requests per second**.\n- Exceeding this limit returns a `429 Too Many Requests` response.\n\nUse these headers to monitor your current rate limit status:\n\n- `X-Ratelimit-Limit`\n- `X-Ratelimit-Remaining`\n- `X-Ratelimit-Reset-Ms`\n\n---\n\n© AeroDB — All rights reserved."
   },
   "tags": [
+    {
+      "name": "Health"
+    },
     {
       "name": "Airports"
     },
@@ -17,10 +20,16 @@
       "name": "Airlines"
     },
     {
-      "name": "Countries"
+      "name": "Airspaces"
+    },
+    {
+      "name": "Reporting Points"
     },
     {
       "name": "Search"
+    },
+    {
+      "name": "Countries"
     },
     {
       "name": "Authentication"
@@ -36,7 +45,7 @@
     "/account/requestResetPassword": {
       "post": {
         "operationId": "Account_requestResetPassword",
-        "summary": "Request a password reset",
+        "summary": "Request password reset",
         "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
         "parameters": [],
         "responses": {
@@ -87,7 +96,7 @@
     "/account/requestValidateEmail": {
       "post": {
         "operationId": "Account_requestValidateEmail",
-        "summary": "Request an email verification",
+        "summary": "Request email verification",
         "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
         "parameters": [],
         "responses": {
@@ -128,7 +137,7 @@
     "/account/updatePassword": {
       "post": {
         "operationId": "Account_updatePassword",
-        "summary": "Update the user password",
+        "summary": "Update user password",
         "description": "Update the user password using a valid reset token.",
         "parameters": [],
         "responses": {
@@ -169,7 +178,7 @@
     "/account/validateEmail": {
       "post": {
         "operationId": "Account_validateEmail",
-        "summary": "Verify the user account",
+        "summary": "Verify user account",
         "description": "Verify the user account using the verification token sent via email.",
         "parameters": [],
         "responses": {
@@ -210,7 +219,7 @@
     "/airlines": {
       "get": {
         "operationId": "Airlines_list",
-        "summary": "List Airlines",
+        "summary": "List airlines",
         "description": "Return a list of Airlines\n\nIf unauthenticated, the result is limited to 5 items.",
         "parameters": [
           {
@@ -277,7 +286,7 @@
     "/airlines/{airlineId}": {
       "get": {
         "operationId": "Airlines_get",
-        "summary": "Get one Airline",
+        "summary": "Get one airline",
         "description": "Return one Airline",
         "parameters": [
           {
@@ -385,7 +394,7 @@
     "/airports/all": {
       "get": {
         "operationId": "Airports_listAll",
-        "summary": "List airports (simplified)",
+        "summary": "List all airports",
         "description": "List airports with minimal details.\n\n*Limit on this operation is increased*",
         "parameters": [
           {
@@ -454,6 +463,102 @@
         },
         "tags": [
           "Airports"
+        ]
+      }
+    },
+    "/airspaces": {
+      "get": {
+        "operationId": "Airspaces_list",
+        "summary": "List airspaces",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.offset"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReadAirspaceItem"
+                      }
+                    }
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Airspaces"
+        ]
+      }
+    },
+    "/airspaces/{identifier}": {
+      "get": {
+        "operationId": "Airspaces_get",
+        "summary": "Get one airspace",
+        "description": "Get a unique airspace.",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadAirspace"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource."
+          }
+        },
+        "tags": [
+          "Airspaces"
         ]
       }
     },
@@ -560,10 +665,35 @@
         ]
       }
     },
+    "/health": {
+      "get": {
+        "operationId": "Health_status",
+        "summary": "Health check",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HealthStatus"
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Health"
+        ],
+        "security": [
+          {}
+        ]
+      }
+    },
     "/login": {
       "post": {
         "operationId": "Auth_login",
-        "summary": "Authenticate a user",
+        "summary": "Login",
         "parameters": [],
         "responses": {
           "200": {
@@ -767,7 +897,7 @@
     "/oauth/validateToken": {
       "post": {
         "operationId": "Auth_validateOAuthToken",
-        "summary": "Validate an OAuth token",
+        "summary": "Validate OAuth token",
         "description": "Return a user account based on a valid OAuth token from a provider based on the user's email.\n\nIf the user does not exist, a new account is created with a generated password.\n\nThe provider will be linked to the user account for future logins.\n\nReturn 404 if no user is found with the email provided by the OAuth provider.\n\nReturn 401 if the OAuth token is invalid or expired.",
         "parameters": [],
         "responses": {
@@ -832,7 +962,7 @@
     "/refreshToken": {
       "post": {
         "operationId": "Auth_refreshToken",
-        "summary": "Retreive a new JWT",
+        "summary": "Retreive new JWT",
         "description": "Request a new JWT using a refresh token.",
         "parameters": [],
         "responses": {
@@ -898,6 +1028,102 @@
         }
       }
     },
+    "/reportingPoints": {
+      "get": {
+        "operationId": "ReportingPoints_list",
+        "summary": "List reporting points",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.offset"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReadReportingPointItem"
+                      }
+                    }
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Reporting Points"
+        ]
+      }
+    },
+    "/reportingPoints/{identifier}": {
+      "get": {
+        "operationId": "ReportingPoints_get",
+        "summary": "Get one reporting point",
+        "description": "Get a unique reporting point.",
+        "parameters": [
+          {
+            "name": "identifier",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReadReportingPoint"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "The server cannot find the requested resource."
+          }
+        },
+        "tags": [
+          "Reporting Points"
+        ]
+      }
+    },
     "/search": {
       "get": {
         "operationId": "Search_search",
@@ -943,7 +1169,7 @@
     "/signup": {
       "post": {
         "operationId": "Auth_signUp",
-        "summary": "Register a new account",
+        "summary": "Sign up",
         "parameters": [],
         "responses": {
           "201": {
@@ -1089,6 +1315,69 @@
       }
     },
     "schemas": {
+      "AirspaceActivity": {
+        "type": "string",
+        "enum": [
+          "PAR",
+          "ACR",
+          "AWK",
+          "ULM",
+          "HGP"
+        ]
+      },
+      "AirspaceClass": {
+        "type": "string",
+        "enum": [
+          "A",
+          "B",
+          "C",
+          "D",
+          "E",
+          "F",
+          "G"
+        ]
+      },
+      "AirspaceType": {
+        "type": "string",
+        "enum": [
+          "R",
+          "D",
+          "P",
+          "CTR",
+          "TMZ",
+          "RMZ",
+          "TMA",
+          "TRA",
+          "TSA",
+          "FIR",
+          "UIR",
+          "ADIZ",
+          "ATZ",
+          "MATZ",
+          "AWY",
+          "MTR",
+          "ALR",
+          "WRA",
+          "PA",
+          "HTZ",
+          "GLD",
+          "TRP",
+          "TIZ",
+          "TIA",
+          "MTA",
+          "CTA",
+          "ACC",
+          "ASR",
+          "LAOR",
+          "MRT",
+          "TFR",
+          "VFRS",
+          "FISS",
+          "LTA",
+          "UTA",
+          "MCTR"
+        ]
+      },
       "AuthLogin": {
         "type": "object",
         "required": [
@@ -1338,7 +1627,13 @@
           "email",
           "verificationDate",
           "lastVerificationTokenSendDate",
-          "apiKey"
+          "apiKey",
+          "apiKeyMonthlyQuotas",
+          "apiKeyMonthlyQuotasUsed",
+          "apiKeyExtraQuotas",
+          "apiKeyExtraQuotasUsed",
+          "subscriptionPlan",
+          "subscriptionCurrentPeriodEnd"
         ],
         "properties": {
           "id": {
@@ -1384,6 +1679,39 @@
           "apiKey": {
             "type": "string",
             "readOnly": true
+          },
+          "apiKeyMonthlyQuotas": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "apiKeyMonthlyQuotasUsed": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "apiKeyExtraQuotas": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "apiKeyExtraQuotasUsed": {
+            "type": "integer",
+            "format": "int32",
+            "readOnly": true
+          },
+          "subscriptionPlan": {
+            "type": "string",
+            "nullable": true,
+            "description": "The user's subscription plan.",
+            "readOnly": true
+          },
+          "subscriptionCurrentPeriodEnd": {
+            "type": "string",
+            "format": "date-time",
+            "nullable": true,
+            "description": "The end date of the user's current subscription period.",
+            "readOnly": true
           }
         },
         "description": "User as visible by it's owner's session (/me endpoint)."
@@ -1418,6 +1746,39 @@
           "heliport"
         ],
         "description": "A type of facility"
+      },
+      "HealthStatus": {
+        "type": "object",
+        "required": [
+          "status",
+          "version",
+          "uptimeSeconds",
+          "timestamp"
+        ],
+        "properties": {
+          "status": {
+            "type": "string",
+            "enum": [
+              "ok"
+            ],
+            "example": "ok"
+          },
+          "version": {
+            "type": "string",
+            "example": "1.0.13"
+          },
+          "uptimeSeconds": {
+            "type": "number",
+            "format": "double",
+            "minimum": 0,
+            "example": 123.45
+          },
+          "timestamp": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2024-01-01T00:00:00Z"
+          }
+        }
       },
       "NotFoundError": {
         "type": "object",
@@ -1822,6 +2183,260 @@
             "items": {
               "$ref": "#/components/schemas/ReadFrequency"
             }
+          }
+        },
+        "description": ""
+      },
+      "ReadAirspace": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "type",
+          "class",
+          "activity",
+          "activatedOnDemand",
+          "activatedOnRequest",
+          "activatedByNotam",
+          "requiresSpecialAgreement",
+          "requiresRequestCompliance",
+          "geometry",
+          "upperLimit",
+          "upperLimitIsFlightLevel",
+          "lowerLimit",
+          "lowerLimitIsFlightLevel"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the reporting point",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the airspace record was last updated",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "description": "Short name or identifier for the airspace (1-32 characters)",
+            "example": "NW"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceType"
+              }
+            ],
+            "nullable": true,
+            "description": "Airspace type classification\n- R: Restricted Area\n- D: Danger Area\n- P: Prohibited Area\n- CTR: Control Zone\n- TMZ: Transponder Mandatory Zone\n- RMZ: Radio Mandatory Zone\n- TMA: Terminal Control Area\n- TRA: Temporary Reserved Area\n- TSA: Temporary Segregated Area\n- FIR: Flight Information Region\n- UIR: Upper Flight Information Region\n- ADIZ: Air Defense Identification Zone\n- ATZ: Aerodrome Traffic Zone\n- MATZ: Military Aerodrome Traffic Zone\n- AWY: Airway\n- MTR: Military Training Route\n- ALR: Alert Area\n- WRA: Warning Area\n- PA: Protected Area\n- HTZ: Helicopter Traffic Zone\n- GLD: Gliding Sector\n- TRP: Terminal Reporting Point Area\n- TIZ: Traffic Information Zone\n- TIA: Traffic Information Area\n- MTA: Military Training Area\n- CTA: Control Area\n- ACC: Area Control Centre Sector\n- ASR: Aerial Sporting or Recreational Activity Area\n- LAOR: Low Altitude Overflight Restriction Area\n- MRT: Military Route\n- TFR: Temporary Flight Restriction\n- VFRS: VFR Sector\n- FISS: Flight Information Service Sector\n- LTA: Low Traffic Area / Low Altitude TMA (country dependent usage)\n- UTA: Upper Control Area\n- MCTR: Military Control Zone",
+            "example": "CTR"
+          },
+          "class": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceClass"
+              }
+            ],
+            "nullable": true,
+            "description": "ICAO airspace classification from A (most restrictive) to G (least restrictive)\n\n- **A**: IFR only, full ATC separation, no VFR allowed\n- **B**: IFR/VFR allowed, full ATC separation for all aircraft\n- **C**: IFR/VFR allowed, IFR fully separated, VFR separated from IFR only\n- **D**: IFR/VFR allowed, IFR separated from IFR, VFR receives traffic advisories\n- **E**: IFR/VFR allowed, IFR receives full service, VFR operates independently\n- **F**: Advisory service only, rarely used (being phased out)\n- **G**: Uncontrolled airspace, no ATC separation provided",
+            "example": "C"
+          },
+          "activity": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceActivity"
+              }
+            ],
+            "nullable": true,
+            "description": "Primary activity conducted within the airspace\n- PAR: Parachuting Activity\n- ACR: Aerobatics Activity\n- AWK: Aeroclub And Aerial Work Area\n- ULM: Ultra Light Machine Activity\n- HGP: Hang Gliding/Paragliding",
+            "example": "PAR"
+          },
+          "activatedOnDemand": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated on demand",
+            "example": false
+          },
+          "activatedOnRequest": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated on request",
+            "example": false
+          },
+          "activatedByNotam": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated by NOTAM (Notice to Airmen)",
+            "example": false
+          },
+          "requiresSpecialAgreement": {
+            "type": "boolean",
+            "description": "Indicates if the airspace requires special agreement for activation",
+            "example": false
+          },
+          "requiresRequestCompliance": {
+            "type": "boolean",
+            "description": "Indicates if compliance with requests is mandatory for this airspace",
+            "example": false
+          },
+          "geometry": {
+            "type": "string",
+            "nullable": true,
+            "description": "GeoJSON representation of the airspace geometry",
+            "example": "{ \"type\": \"Polygon\", \"coordinates\": [ [ [30, 10], [40, 40], [20, 40], [10, 20], [30, 10] ] ] }"
+          },
+          "upperLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Upper limit of the airspace in feet or flight level",
+            "example": 25
+          },
+          "upperLimitIsFlightLevel": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the upper limit is specified as a flight level",
+            "example": true
+          },
+          "lowerLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Lower limit of the airspace in feet or flight level",
+            "example": 0
+          },
+          "lowerLimitIsFlightLevel": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the lower limit is specified as a flight level",
+            "example": false
+          }
+        },
+        "description": ""
+      },
+      "ReadAirspaceItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "type",
+          "class",
+          "activity",
+          "activatedOnDemand",
+          "activatedOnRequest",
+          "activatedByNotam",
+          "requiresSpecialAgreement",
+          "requiresRequestCompliance",
+          "geometry",
+          "upperLimit",
+          "upperLimitIsFlightLevel",
+          "lowerLimit",
+          "lowerLimitIsFlightLevel"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the reporting point",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Timestamp when the airspace record was last updated",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "description": "Short name or identifier for the airspace (1-32 characters)",
+            "example": "NW"
+          },
+          "type": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceType"
+              }
+            ],
+            "nullable": true,
+            "description": "Airspace type classification\n- R: Restricted Area\n- D: Danger Area\n- P: Prohibited Area\n- CTR: Control Zone\n- TMZ: Transponder Mandatory Zone\n- RMZ: Radio Mandatory Zone\n- TMA: Terminal Control Area\n- TRA: Temporary Reserved Area\n- TSA: Temporary Segregated Area\n- FIR: Flight Information Region\n- UIR: Upper Flight Information Region\n- ADIZ: Air Defense Identification Zone\n- ATZ: Aerodrome Traffic Zone\n- MATZ: Military Aerodrome Traffic Zone\n- AWY: Airway\n- MTR: Military Training Route\n- ALR: Alert Area\n- WRA: Warning Area\n- PA: Protected Area\n- HTZ: Helicopter Traffic Zone\n- GLD: Gliding Sector\n- TRP: Terminal Reporting Point Area\n- TIZ: Traffic Information Zone\n- TIA: Traffic Information Area\n- MTA: Military Training Area\n- CTA: Control Area\n- ACC: Area Control Centre Sector\n- ASR: Aerial Sporting or Recreational Activity Area\n- LAOR: Low Altitude Overflight Restriction Area\n- MRT: Military Route\n- TFR: Temporary Flight Restriction\n- VFRS: VFR Sector\n- FISS: Flight Information Service Sector\n- LTA: Low Traffic Area / Low Altitude TMA (country dependent usage)\n- UTA: Upper Control Area\n- MCTR: Military Control Zone",
+            "example": "CTR"
+          },
+          "class": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceClass"
+              }
+            ],
+            "nullable": true,
+            "description": "ICAO airspace classification from A (most restrictive) to G (least restrictive)\n\n- **A**: IFR only, full ATC separation, no VFR allowed\n- **B**: IFR/VFR allowed, full ATC separation for all aircraft\n- **C**: IFR/VFR allowed, IFR fully separated, VFR separated from IFR only\n- **D**: IFR/VFR allowed, IFR separated from IFR, VFR receives traffic advisories\n- **E**: IFR/VFR allowed, IFR receives full service, VFR operates independently\n- **F**: Advisory service only, rarely used (being phased out)\n- **G**: Uncontrolled airspace, no ATC separation provided",
+            "example": "C"
+          },
+          "activity": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/AirspaceActivity"
+              }
+            ],
+            "nullable": true,
+            "description": "Primary activity conducted within the airspace\n- PAR: Parachuting Activity\n- ACR: Aerobatics Activity\n- AWK: Aeroclub And Aerial Work Area\n- ULM: Ultra Light Machine Activity\n- HGP: Hang Gliding/Paragliding",
+            "example": "PAR"
+          },
+          "activatedOnDemand": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated on demand",
+            "example": false
+          },
+          "activatedOnRequest": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated on request",
+            "example": false
+          },
+          "activatedByNotam": {
+            "type": "boolean",
+            "description": "Indicates if the airspace is activated by NOTAM (Notice to Airmen)",
+            "example": false
+          },
+          "requiresSpecialAgreement": {
+            "type": "boolean",
+            "description": "Indicates if the airspace requires special agreement for activation",
+            "example": false
+          },
+          "requiresRequestCompliance": {
+            "type": "boolean",
+            "description": "Indicates if compliance with requests is mandatory for this airspace",
+            "example": false
+          },
+          "geometry": {
+            "type": "string",
+            "nullable": true,
+            "description": "GeoJSON representation of the airspace geometry",
+            "example": "{ \"type\": \"Polygon\", \"coordinates\": [ [ [30, 10], [40, 40], [20, 40], [10, 20], [30, 10] ] ] }"
+          },
+          "upperLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Upper limit of the airspace in feet or flight level",
+            "example": 25
+          },
+          "upperLimitIsFlightLevel": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the upper limit is specified as a flight level",
+            "example": true
+          },
+          "lowerLimit": {
+            "type": "integer",
+            "nullable": true,
+            "description": "Lower limit of the airspace in feet or flight level",
+            "example": 0
+          },
+          "lowerLimitIsFlightLevel": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the lower limit is specified as a flight level",
+            "example": false
           }
         },
         "description": ""
@@ -2231,6 +2846,128 @@
             "type": "boolean",
             "nullable": true,
             "description": "Indicates if the NOTAM is related to a procedure."
+          }
+        },
+        "description": ""
+      },
+      "ReadReportingPoint": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "latitude",
+          "longitude",
+          "elevation",
+          "isAgl",
+          "isCompulsory"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the reporting point",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "example": "NW"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Elevation in feet",
+            "example": 1026
+          },
+          "isAgl": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if elevation is Above Ground Level",
+            "example": false
+          },
+          "isCompulsory": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if this is a compulsory reporting point",
+            "example": true
+          }
+        },
+        "description": ""
+      },
+      "ReadReportingPointItem": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "latitude",
+          "longitude",
+          "elevation",
+          "isAgl",
+          "isCompulsory"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the reporting point",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 32,
+            "example": "NW"
+          },
+          "latitude": {
+            "type": "number",
+            "format": "double",
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "format": "double",
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Elevation in feet",
+            "example": 1026
+          },
+          "isAgl": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if elevation is Above Ground Level",
+            "example": false
+          },
+          "isCompulsory": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if this is a compulsory reporting point",
+            "example": true
           }
         },
         "description": ""
