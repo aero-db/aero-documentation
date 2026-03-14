@@ -11,11 +11,8 @@ hero:
     height: 128
   actions:
     - theme: brand
-      text: API documentation
+      text: Read the documentation
       link: /introduction
-    - theme: alt
-      text: Pricing
-      link: /pricing
 features:
   - icon: 🛫
     title: Simple and Documented

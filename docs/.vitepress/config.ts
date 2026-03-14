@@ -45,7 +45,8 @@ export default defineConfig({
     nav: [ 
       { text: 'Airports', link: '/operations/Airports_list.html' },
       { text: 'Notams', link: '/operations/Notams_list.html' },
-      { text: 'Pricing', link: '/pricing' },
+      { text: 'Airlines', link: '/operations/Airlines_list.html' },
+      { text: 'Airspaces', link: '/operations/Airspaces_list.html' },
     ],
     search: {
       provider: 'local',
