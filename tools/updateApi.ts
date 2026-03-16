@@ -9,7 +9,7 @@ async function updateApiDoc() {
 
   console.log('🔄 Retreiving AeroDB API documentation...');
   try {
-    const apiFile = await axios.get(`https://api.aerodb.net/api.json`);
+    const apiFile = await axios.get(`https://api.aerodb.net/openapi.json`);
 
     // Remove internal paths
     const filteredPaths = Object.fromEntries(
