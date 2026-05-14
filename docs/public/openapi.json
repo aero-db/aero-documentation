@@ -1050,53 +1050,6 @@
         }
       }
     },
-    "/users/{userId}/refreshApiKey": {
-      "post": {
-        "operationId": "Users_refresh",
-        "summary": "Refresh API key",
-        "description": "Refresh a user's API key.",
-        "parameters": [
-          {
-            "name": "userId",
-            "in": "path",
-            "required": true,
-            "schema": {
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/CurrentUser"
-                }
-              }
-            }
-          },
-          "404": {
-            "description": "The server cannot find the requested resource.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/NotFoundError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Users"
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
     "/webhooks/stripe": {
       "post": {
         "operationId": "Internal_stripeWebhook",
