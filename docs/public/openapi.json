@@ -2,9 +2,9 @@
   "openapi": "3.0.0",
   "info": {
     "title": "AeroDB API",
-    "version": "1.0.16",
+    "version": "1.2.5",
     "summary": "The AeroDB API provides access to a wide range of aeronautical data.",
-    "description": "## General Information\n\n- All properties are **always returned** and **must be provided**,\nbut can be `null` if not applicable.\n- Some endpoints require **authentication via API key**.\n\n## Filtering, Sorting & Offset\n\nCertain endpoints support **filtering**, **sorting**, and **offset** to control and refine list results.\n\n### Query Parameters\n\n| Parameter | Type | Default | Description |\n|------------|-------|----------|--------------|\n| `limit` | `int32` | `100` | Maximum number of items per page. Cannot exceed **300**. |\n| `offset` | `int32` | `0` | Number of items to skip before starting to collect results. |\n| `filter` | `string` (Base64) | — | Base64-encoded JSON object defining filtering conditions. |\n| `sort` | `string` (Base64) | — | Base64-encoded JSON object defining sorting order. |\n\n---\n\n### Filtering Example\n\nYou can filter airports by one or more properties using a **Base64-encoded JSON filter**.\n\n#### JSON before encoding:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n```\n\n#### Final request:\n> /airports?limit=50&offset=0&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n\n---\n\n### Sorting Example\n\nYou can define multiple sort rules, each specifying a property and direction (`asc` or `desc`).\n\n#### JSON before encoding:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n```\n\n#### Final request:\n> /airports?limit=20&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\n---\n\n### Combined Example\n\nYou can combine **filter**, **sort**, **limit**, and **offset** in a single request.\n\n> /airports?limit=100&offset=200&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\nThis will return up to **100 Spanish airports**, skipping the first **200**, sorted by **name (asc)** then **city (desc)**.\n\n---\n\n## Rate Limiting\n\n- The API enforces a per-IP rate limit of approximately **10 requests per second**.\n- Exceeding this limit returns a `429 Too Many Requests` response.\n\nUse these headers to monitor your current rate limit status:\n\n- `X-Ratelimit-Limit`\n- `X-Ratelimit-Remaining`\n- `X-Ratelimit-Reset-Ms`\n\n---\n\n© AeroDB — All rights reserved."
+    "description": "## General Information\n\n- All properties are **always returned** and **must be provided**,\nbut can be `null` if not applicable.\n- Some endpoints require **authentication via API key**.\n\n## Filtering, Sorting & Offset\n\nCertain endpoints support **filtering**, **sorting**, and **offset** to control and refine list results.\n\n### Query Parameters\n\n| Parameter | Type | Default | Description |\n|------------|-------|----------|--------------|\n| `limit` | `int32` | `100` | Maximum number of items per page. Cannot exceed **300**. |\n| `offset` | `int32` | `0` | Number of items to skip before starting to collect results. |\n| `filter` | `string` (Base64) | — | Base64-encoded JSON object defining filtering conditions. |\n| `sort` | `string` (Base64) | — | Base64-encoded JSON object defining sorting order. |\n\n---\n\n### Filtering Example\n\nYou can filter airports by one or more properties using a **Base64-encoded JSON filter**.\n\n#### JSON before encoding:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n```\n\n#### Final request:\n> /airports?limit=50&offset=0&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n\n---\n\n### Sorting Example\n\nYou can define multiple sort rules, each specifying a property and direction (`asc` or `desc`).\n\n#### JSON before encoding:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n```\n\n#### Final request:\n> /airports?limit=20&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\n---\n\n### Combined Example\n\nYou can combine **filter**, **sort**, **limit**, and **offset** in a single request.\n\n#### Decoded filter value:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Decoded sort value:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Final request:\n> /airports?limit=100&offset=200&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\nThis will return up to **100 Spanish airports**, skipping the first **200**, sorted by **name (asc)** then **city (desc)**.\n\n---\n\n## Rate Limiting\n\n- The API enforces a per-IP rate limit of approximately **10 requests per second**.\n- Exceeding this limit returns a `429 Too Many Requests` response.\n\nUse these headers to monitor your current rate limit status:\n\n- `X-Ratelimit-Limit`\n- `X-Ratelimit-Remaining`\n- `X-Ratelimit-Reset-Ms`\n\n---\n\n© AeroDB — All rights reserved."
   },
   "tags": [
     {
@@ -39,188 +39,17 @@
     },
     {
       "name": "Users"
+    },
+    {
+      "name": "Internal"
     }
   ],
   "paths": {
-    "/account/requestResetPassword": {
-      "post": {
-        "operationId": "Account_requestResetPassword",
-        "summary": "Request password reset",
-        "description": "Invalidate the previous validation token and send a new one.\n\n- Send an email to the user with a password reset link.\n\n- The new reset token will be valid for 1 hour.\n\n- Previous validation token requests must be at least 15 minutes old.\n\n- User must be authenticated.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthRequestResetPassword"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/account/requestValidateEmail": {
-      "post": {
-        "operationId": "Account_requestValidateEmail",
-        "summary": "Request email verification",
-        "description": "Invalidate the previous validation token and send a new one to the user's email.\n\n- Send an email to the user with a verification link.\n\n- User must NOT be verified already.\n\n- The new verification token will be valid for 1 hour.\n\n- Previous verification token requests must be at least 15 minutes old.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Client error",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/TooManyRequestsError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "security": [
-          {
-            "BearerAuth": []
-          }
-        ]
-      }
-    },
-    "/account/updatePassword": {
-      "post": {
-        "operationId": "Account_updatePassword",
-        "summary": "Update user password",
-        "description": "Update the user password using a valid reset token.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthUpdatePassword"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
-    "/account/validateEmail": {
-      "post": {
-        "operationId": "Account_validateEmail",
-        "summary": "Verify user account",
-        "description": "Verify the user account using the verification token sent via email.",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          },
-          "400": {
-            "description": "The server could not understand the request due to invalid syntax.",
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ValidationError"
-                }
-              }
-            }
-          }
-        },
-        "tags": [
-          "Account"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/AuthValidateEmail"
-              }
-            }
-          }
-        },
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
-        ]
-      }
-    },
     "/airlines": {
       "get": {
         "operationId": "Airlines_list",
         "summary": "List airlines",
-        "description": "Return a list of Airlines\n\nIf unauthenticated, the result is limited to 5 items.",
+        "description": "Return a list of Airlines",
         "parameters": [
           {
             "$ref": "#/components/parameters/ListParameters.limit"
@@ -263,7 +92,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ReadAirlineItem"
+                        "$ref": "#/components/schemas/ReadAirline"
                       }
                     }
                   },
@@ -275,11 +104,6 @@
         },
         "tags": [
           "Airlines"
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
         ]
       }
     },
@@ -322,11 +146,6 @@
         },
         "tags": [
           "Airlines"
-        ],
-        "security": [
-          {
-            "ApiKeyAuth": []
-          }
         ]
       }
     },
@@ -376,7 +195,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ReadListAirport"
+                        "$ref": "#/components/schemas/ListAirport"
                       }
                     }
                   },
@@ -470,6 +289,7 @@
       "get": {
         "operationId": "Airspaces_list",
         "summary": "List airspaces",
+        "description": "Return a list of airspaces.\n\nCost: `3` credits",
         "parameters": [
           {
             "$ref": "#/components/parameters/ListParameters.limit"
@@ -512,7 +332,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ReadAirspaceItem"
+                        "$ref": "#/components/schemas/ReadAirspace"
                       }
                     }
                   },
@@ -524,6 +344,11 @@
         },
         "tags": [
           "Airspaces"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
         ]
       }
     },
@@ -531,7 +356,7 @@
       "get": {
         "operationId": "Airspaces_get",
         "summary": "Get one airspace",
-        "description": "Get a unique airspace.",
+        "description": "Get a unique airspace.\n\nCost: `1` credit",
         "parameters": [
           {
             "name": "identifier",
@@ -559,6 +384,11 @@
         },
         "tags": [
           "Airspaces"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
         ]
       }
     },
@@ -566,10 +396,10 @@
       "get": {
         "operationId": "Countries_list",
         "summary": "List countries",
-        "description": "*Limit on this operation is increased to 500*",
+        "description": "Return a list of countries.",
         "parameters": [
           {
-            "$ref": "#/components/parameters/UnlimitedListParameters"
+            "$ref": "#/components/parameters/ListParameters.limit"
           },
           {
             "$ref": "#/components/parameters/ListParameters.offset"
@@ -628,6 +458,7 @@
       "get": {
         "operationId": "Countries_get",
         "summary": "Get one country",
+        "description": "Return one country.",
         "parameters": [
           {
             "name": "countryId",
@@ -784,7 +615,7 @@
       "get": {
         "operationId": "Notams_list",
         "summary": "List NOTAMs",
-        "description": "Return a list of NOTAMs\n\nIf unauthenticated, the result is limited to 5 items.",
+        "description": "Return a list of NOTAMs\n\nCost: `5` credits\n\n**NOTE:** If unauthenticated, only active NOTAMs will be returned",
         "parameters": [
           {
             "$ref": "#/components/parameters/ListParameters.limit"
@@ -827,7 +658,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ReadNotamItem"
+                        "$ref": "#/components/schemas/ReadNotam"
                       }
                     }
                   },
@@ -851,7 +682,7 @@
       "get": {
         "operationId": "Notams_get",
         "summary": "Get one NOTAM",
-        "description": "Return one NOTAM",
+        "description": "Return one NOTAM\n\nCost: `2` credits",
         "parameters": [
           {
             "name": "notamId",
@@ -1032,6 +863,7 @@
       "get": {
         "operationId": "ReportingPoints_list",
         "summary": "List reporting points",
+        "description": "Return a list of reporting points.\n\nCost: `2` credits",
         "parameters": [
           {
             "$ref": "#/components/parameters/ListParameters.limit"
@@ -1074,7 +906,7 @@
                     "items": {
                       "type": "array",
                       "items": {
-                        "$ref": "#/components/schemas/ReadReportingPointItem"
+                        "$ref": "#/components/schemas/ReadReportingPoint"
                       }
                     }
                   },
@@ -1086,6 +918,11 @@
         },
         "tags": [
           "Reporting Points"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
         ]
       }
     },
@@ -1093,7 +930,7 @@
       "get": {
         "operationId": "ReportingPoints_get",
         "summary": "Get one reporting point",
-        "description": "Get a unique reporting point.",
+        "description": "Get a unique reporting point.\n\nCost: `1` credit",
         "parameters": [
           {
             "name": "identifier",
@@ -1121,6 +958,11 @@
         },
         "tags": [
           "Reporting Points"
+        ],
+        "security": [
+          {
+            "ApiKeyAuth": []
+          }
         ]
       }
     },
@@ -1212,6 +1054,7 @@
       "post": {
         "operationId": "Users_refresh",
         "summary": "Refresh API key",
+        "description": "Refresh a user's API key.",
         "parameters": [
           {
             "name": "userId",
@@ -1252,6 +1095,31 @@
             "ApiKeyAuth": []
           }
         ]
+      }
+    },
+    "/webhooks/stripe": {
+      "post": {
+        "operationId": "Internal_stripeWebhook",
+        "summary": "Stripe Webhook Handler",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded."
+          }
+        },
+        "tags": [
+          "Internal"
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "text/plain": {
+              "schema": {
+                "type": "string"
+              }
+            }
+          }
+        }
       }
     }
   },
@@ -1632,8 +1500,9 @@
           "apiKeyMonthlyQuotasUsed",
           "apiKeyExtraQuotas",
           "apiKeyExtraQuotasUsed",
-          "subscriptionPlan",
-          "subscriptionCurrentPeriodEnd"
+          "stripeCustomerId",
+          "subscriptions",
+          "stripeCustomer"
         ],
         "properties": {
           "id": {
@@ -1700,17 +1569,27 @@
             "format": "int32",
             "readOnly": true
           },
-          "subscriptionPlan": {
+          "stripeCustomerId": {
             "type": "string",
             "nullable": true,
-            "description": "The user's subscription plan.",
             "readOnly": true
           },
-          "subscriptionCurrentPeriodEnd": {
-            "type": "string",
-            "format": "date-time",
+          "subscriptions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StripeSubscription"
+            },
             "nullable": true,
-            "description": "The end date of the user's current subscription period.",
+            "readOnly": true
+          },
+          "stripeCustomer": {
+            "type": "object",
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/StripeCustomer"
+              }
+            ],
+            "nullable": true,
             "readOnly": true
           }
         },
@@ -1779,6 +1658,179 @@
             "example": "2024-01-01T00:00:00Z"
           }
         }
+      },
+      "ListAirport": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "icaoCode",
+          "iataCode",
+          "localCode",
+          "latitude",
+          "longitude",
+          "elevation",
+          "countryCode",
+          "city",
+          "state",
+          "county",
+          "continentCode",
+          "timezone",
+          "facilityType",
+          "isPrivate",
+          "isMilitary",
+          "isCivilian",
+          "isClosed",
+          "isVFR",
+          "isIFR",
+          "pprRequired"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the airport",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "minLength": 2,
+            "maxLength": 200,
+            "example": "Hartsfield–Jackson Atlanta International Airport"
+          },
+          "icaoCode": {
+            "type": "string",
+            "pattern": "^[A-Z0-9]{4}$",
+            "description": "ICAO airport code, a four-letter alphanumeric code",
+            "example": "KATL"
+          },
+          "iataCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z0-9]{3}$",
+            "description": "IATA airport code, a three-letter alphanumeric code",
+            "example": "ATL"
+          },
+          "localCode": {
+            "type": "string",
+            "nullable": true,
+            "example": "ATL"
+          },
+          "latitude": {
+            "type": "number",
+            "nullable": true,
+            "example": 33.6407
+          },
+          "longitude": {
+            "type": "number",
+            "nullable": true,
+            "example": -84.4277
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "example": 1026
+          },
+          "countryCode": {
+            "type": "string",
+            "nullable": true,
+            "pattern": "^[A-Z]{2}$",
+            "description": "ISO 3166-1 alpha-2 country code",
+            "example": "US"
+          },
+          "city": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Atlanta"
+          },
+          "state": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 1,
+            "maxLength": 50,
+            "example": "Georgia"
+          },
+          "county": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 50,
+            "example": "Fulton"
+          },
+          "continentCode": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/ContinentCode"
+              }
+            ],
+            "nullable": true,
+            "description": "ISO 3166-1 continent code",
+            "example": "NA"
+          },
+          "timezone": {
+            "type": "string",
+            "nullable": true,
+            "minLength": 2,
+            "maxLength": 100,
+            "example": "America/New_York"
+          },
+          "facilityType": {
+            "allOf": [
+              {
+                "$ref": "#/components/schemas/FACILITY_TYPE"
+              }
+            ],
+            "nullable": true,
+            "example": "airport"
+          },
+          "isPrivate": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isMilitary": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isCivilian": {
+            "type": "boolean",
+            "nullable": true,
+            "example": true
+          },
+          "isClosed": {
+            "type": "boolean",
+            "nullable": true,
+            "example": false
+          },
+          "isVFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
+            "example": false
+          },
+          "isIFR": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
+            "example": false
+          },
+          "pprRequired": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "Indicates if prior permission is required for landing",
+            "example": false
+          }
+        },
+        "description": "The template for omitting properties."
       },
       "NotFoundError": {
         "type": "object",
@@ -1904,101 +1956,7 @@
             "nullable": true,
             "description": "Date when the airline ceased operations."
           }
-        },
-        "description": ""
-      },
-      "ReadAirlineItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "createdAt",
-          "name",
-          "icaoCode",
-          "iataCode",
-          "callsign",
-          "websiteUrl",
-          "countryCode",
-          "fleetSize",
-          "operationStartDate",
-          "operationEndDate"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "example": "123e4567-e89b-12d3-a456-426614174000"
-          },
-          "createdAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 100,
-            "description": "The airline's name.",
-            "example": "Air France"
-          },
-          "icaoCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 3,
-            "maxLength": 4,
-            "description": "The airline's ICAO code.",
-            "example": "AFR"
-          },
-          "iataCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 3,
-            "description": "The airline's IATA code.",
-            "example": "AF"
-          },
-          "callsign": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 50,
-            "description": "The airline's callsign.",
-            "example": "AIRFRANS"
-          },
-          "websiteUrl": {
-            "type": "string",
-            "nullable": true,
-            "maxLength": 200,
-            "description": "The airline's website URL.",
-            "example": "https://www.airfrance.com"
-          },
-          "countryCode": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 2,
-            "description": "ISO 3166-1 alpha-2 country code of the airline's primary country.",
-            "example": "FR"
-          },
-          "fleetSize": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "description": "Number of aircraft in the airline's fleet.",
-            "example": 150
-          },
-          "operationStartDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "description": "Date when the airline started operations."
-          },
-          "operationEndDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true,
-            "description": "Date when the airline ceased operations."
-          }
-        },
-        "description": ""
+        }
       },
       "ReadAirport": {
         "type": "object",
@@ -2184,8 +2142,7 @@
               "$ref": "#/components/schemas/ReadFrequency"
             }
           }
-        },
-        "description": ""
+        }
       },
       "ReadAirspace": {
         "type": "object",
@@ -2312,134 +2269,7 @@
             "example": false
           }
         },
-        "description": ""
-      },
-      "ReadAirspaceItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "type",
-          "class",
-          "activity",
-          "activatedOnDemand",
-          "activatedOnRequest",
-          "activatedByNotam",
-          "requiresSpecialAgreement",
-          "requiresRequestCompliance",
-          "geometry",
-          "upperLimit",
-          "upperLimitIsFlightLevel",
-          "lowerLimit",
-          "lowerLimitIsFlightLevel"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the reporting point",
-            "example": "0000-ffff-0000-ffff"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "description": "Timestamp when the airspace record was last updated",
-            "example": "2020-01-01T00:00:00Z"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32,
-            "description": "Short name or identifier for the airspace (1-32 characters)",
-            "example": "NW"
-          },
-          "type": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AirspaceType"
-              }
-            ],
-            "nullable": true,
-            "description": "Airspace type classification\n- R: Restricted Area\n- D: Danger Area\n- P: Prohibited Area\n- CTR: Control Zone\n- TMZ: Transponder Mandatory Zone\n- RMZ: Radio Mandatory Zone\n- TMA: Terminal Control Area\n- TRA: Temporary Reserved Area\n- TSA: Temporary Segregated Area\n- FIR: Flight Information Region\n- UIR: Upper Flight Information Region\n- ADIZ: Air Defense Identification Zone\n- ATZ: Aerodrome Traffic Zone\n- MATZ: Military Aerodrome Traffic Zone\n- AWY: Airway\n- MTR: Military Training Route\n- ALR: Alert Area\n- WRA: Warning Area\n- PA: Protected Area\n- HTZ: Helicopter Traffic Zone\n- GLD: Gliding Sector\n- TRP: Terminal Reporting Point Area\n- TIZ: Traffic Information Zone\n- TIA: Traffic Information Area\n- MTA: Military Training Area\n- CTA: Control Area\n- ACC: Area Control Centre Sector\n- ASR: Aerial Sporting or Recreational Activity Area\n- LAOR: Low Altitude Overflight Restriction Area\n- MRT: Military Route\n- TFR: Temporary Flight Restriction\n- VFRS: VFR Sector\n- FISS: Flight Information Service Sector\n- LTA: Low Traffic Area / Low Altitude TMA (country dependent usage)\n- UTA: Upper Control Area\n- MCTR: Military Control Zone",
-            "example": "CTR"
-          },
-          "class": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AirspaceClass"
-              }
-            ],
-            "nullable": true,
-            "description": "ICAO airspace classification from A (most restrictive) to G (least restrictive)\n\n- **A**: IFR only, full ATC separation, no VFR allowed\n- **B**: IFR/VFR allowed, full ATC separation for all aircraft\n- **C**: IFR/VFR allowed, IFR fully separated, VFR separated from IFR only\n- **D**: IFR/VFR allowed, IFR separated from IFR, VFR receives traffic advisories\n- **E**: IFR/VFR allowed, IFR receives full service, VFR operates independently\n- **F**: Advisory service only, rarely used (being phased out)\n- **G**: Uncontrolled airspace, no ATC separation provided",
-            "example": "C"
-          },
-          "activity": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/AirspaceActivity"
-              }
-            ],
-            "nullable": true,
-            "description": "Primary activity conducted within the airspace\n- PAR: Parachuting Activity\n- ACR: Aerobatics Activity\n- AWK: Aeroclub And Aerial Work Area\n- ULM: Ultra Light Machine Activity\n- HGP: Hang Gliding/Paragliding",
-            "example": "PAR"
-          },
-          "activatedOnDemand": {
-            "type": "boolean",
-            "description": "Indicates if the airspace is activated on demand",
-            "example": false
-          },
-          "activatedOnRequest": {
-            "type": "boolean",
-            "description": "Indicates if the airspace is activated on request",
-            "example": false
-          },
-          "activatedByNotam": {
-            "type": "boolean",
-            "description": "Indicates if the airspace is activated by NOTAM (Notice to Airmen)",
-            "example": false
-          },
-          "requiresSpecialAgreement": {
-            "type": "boolean",
-            "description": "Indicates if the airspace requires special agreement for activation",
-            "example": false
-          },
-          "requiresRequestCompliance": {
-            "type": "boolean",
-            "description": "Indicates if compliance with requests is mandatory for this airspace",
-            "example": false
-          },
-          "geometry": {
-            "type": "string",
-            "nullable": true,
-            "description": "GeoJSON representation of the airspace geometry",
-            "example": "{ \"type\": \"Polygon\", \"coordinates\": [ [ [30, 10], [40, 40], [20, 40], [10, 20], [30, 10] ] ] }"
-          },
-          "upperLimit": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Upper limit of the airspace in feet or flight level",
-            "example": 25
-          },
-          "upperLimitIsFlightLevel": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the upper limit is specified as a flight level",
-            "example": true
-          },
-          "lowerLimit": {
-            "type": "integer",
-            "nullable": true,
-            "description": "Lower limit of the airspace in feet or flight level",
-            "example": 0
-          },
-          "lowerLimitIsFlightLevel": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the lower limit is specified as a flight level",
-            "example": false
-          }
-        },
-        "description": ""
+        "description": "Represents an airspace with its properties, classification, and operational characteristics.\nAn airspace is a defined three-dimensional region of airspace within which specific rules,\nrestrictions, or procedures may apply to aircraft operations."
       },
       "ReadFrequency": {
         "type": "object",
@@ -2482,179 +2312,6 @@
             "example": 118.83
           }
         }
-      },
-      "ReadListAirport": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "icaoCode",
-          "iataCode",
-          "localCode",
-          "latitude",
-          "longitude",
-          "elevation",
-          "countryCode",
-          "city",
-          "state",
-          "county",
-          "continentCode",
-          "timezone",
-          "facilityType",
-          "isPrivate",
-          "isMilitary",
-          "isCivilian",
-          "isClosed",
-          "isVFR",
-          "isIFR",
-          "pprRequired"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the airport",
-            "example": "0000-ffff-0000-ffff"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 2,
-            "maxLength": 200,
-            "example": "Hartsfield–Jackson Atlanta International Airport"
-          },
-          "icaoCode": {
-            "type": "string",
-            "pattern": "^[A-Z0-9]{4}$",
-            "description": "ICAO airport code, a four-letter alphanumeric code",
-            "example": "KATL"
-          },
-          "iataCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z0-9]{3}$",
-            "description": "IATA airport code, a three-letter alphanumeric code",
-            "example": "ATL"
-          },
-          "localCode": {
-            "type": "string",
-            "nullable": true,
-            "example": "ATL"
-          },
-          "latitude": {
-            "type": "number",
-            "nullable": true,
-            "example": 33.6407
-          },
-          "longitude": {
-            "type": "number",
-            "nullable": true,
-            "example": -84.4277
-          },
-          "elevation": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "example": 1026
-          },
-          "countryCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z]{2}$",
-            "description": "ISO 3166-1 alpha-2 country code",
-            "example": "US"
-          },
-          "city": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 50,
-            "example": "Atlanta"
-          },
-          "state": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 1,
-            "maxLength": 50,
-            "example": "Georgia"
-          },
-          "county": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 50,
-            "example": "Fulton"
-          },
-          "continentCode": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/ContinentCode"
-              }
-            ],
-            "nullable": true,
-            "description": "ISO 3166-1 continent code",
-            "example": "NA"
-          },
-          "timezone": {
-            "type": "string",
-            "nullable": true,
-            "minLength": 2,
-            "maxLength": 100,
-            "example": "America/New_York"
-          },
-          "facilityType": {
-            "allOf": [
-              {
-                "$ref": "#/components/schemas/FACILITY_TYPE"
-              }
-            ],
-            "nullable": true,
-            "example": "airport"
-          },
-          "isPrivate": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isMilitary": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isCivilian": {
-            "type": "boolean",
-            "nullable": true,
-            "example": true
-          },
-          "isClosed": {
-            "type": "boolean",
-            "nullable": true,
-            "example": false
-          },
-          "isVFR": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the airport is VFR (Visual Flight Rules) capable",
-            "example": false
-          },
-          "isIFR": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the airport is IFR (Instrument Flight Rules) capable",
-            "example": false
-          },
-          "pprRequired": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if prior permission is required for landing",
-            "example": false
-          }
-        },
-        "description": ""
       },
       "ReadNotam": {
         "type": "object",
@@ -2751,104 +2408,24 @@
             "description": "Indicates if the NOTAM is related to a procedure."
           }
         },
-        "description": ""
-      },
-      "ReadNotamItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "notamId",
-          "message",
-          "transactionId",
-          "icaoCode",
-          "issueDate",
-          "startDate",
-          "endDate",
-          "canceledDate",
-          "source",
-          "sourceType",
-          "mapPointer",
-          "geometry",
-          "isSnowtam",
-          "isProcedure"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the notam"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time"
-          },
-          "notamId": {
-            "type": "string",
-            "nullable": true
-          },
-          "message": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 3000,
-            "description": "The NOTAM message text."
-          },
-          "transactionId": {
-            "type": "string",
-            "nullable": true
-          },
-          "icaoCode": {
-            "type": "string",
-            "nullable": true,
-            "pattern": "^[A-Z]{4}$"
-          },
-          "issueDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "startDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "endDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "canceledDate": {
-            "type": "string",
-            "format": "date-time",
-            "nullable": true
-          },
-          "source": {
-            "type": "string",
-            "nullable": true
-          },
-          "sourceType": {
-            "type": "string",
-            "nullable": true
-          },
-          "mapPointer": {
-            "type": "string",
-            "nullable": true
-          },
-          "geometry": {
-            "type": "string",
-            "nullable": true
-          },
-          "isSnowtam": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the NOTAM is a SNOWTAM.\nA SNOWTAM (Snow and/or Ice NOTAM) is a special type of NOTAM (Notice to Airmen) issued by an airport to provide pilots with critical information about hazardous conditions on the movement area (runways and taxiways) caused by snow, ice, slush, frost, or standing water"
-          },
-          "isProcedure": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if the NOTAM is related to a procedure."
-          }
-        },
-        "description": ""
+        "example": {
+          "id": "67155d167139c42577c75279",
+          "notamId": "A0611/24",
+          "message": "A0611/24 NOTAMN\n    Q) LSAS/QFATT/IV/BO/A/000/999/4614N00607E005\n    A) LSGG B) 2410310000 C) 2411132359\n    E) TRIGGER NOTAM - PERM AIRAC AMDT 010/2024:\n    MAG VAR REVISED. \n    RDO NAV AND LDG AIDS GLA, GVA AND SPR DELETED AND PAS, LOC 22, \n    DME 22 AND LOC 04 REVISED. \n    FLT PROC SPECIAL REGULATION FOR GENEVA TMA/CTR REVISED. \n    SEVERAL SID AND STAR REVISED. \n    ADC, AOC AND ARC REVISED.\n    IAC SRA RWY 04 AND IAC SRA RWY 22 WITHDRAWN. \n    SEVERAL IAC REVISED.",
+          "transactionId": "73707264",
+          "icaoCode": "LSGG",
+          "issueDate": "2024-09-19T04:00:00.000+00:00",
+          "startDate": "2024-09-19T04:00:00.000+00:00",
+          "endDate": "2024-09-19T04:00:00.000+00:00",
+          "source": "USNS",
+          "sourceType": "I",
+          "mapPointer": "POINT(6.10895 46.23806389)",
+          "geometry": "POINT(5105901.28612306 4966695.40062213)",
+          "updatedAt": "2024-09-19T04:00:00.000+00:00",
+          "canceledDate": null,
+          "isSnowtam": false,
+          "isProcedure": false
+        }
       },
       "ReadReportingPoint": {
         "type": "object",
@@ -2908,69 +2485,7 @@
             "description": "Indicates if this is a compulsory reporting point",
             "example": true
           }
-        },
-        "description": ""
-      },
-      "ReadReportingPointItem": {
-        "type": "object",
-        "required": [
-          "id",
-          "updatedAt",
-          "name",
-          "latitude",
-          "longitude",
-          "elevation",
-          "isAgl",
-          "isCompulsory"
-        ],
-        "properties": {
-          "id": {
-            "type": "string",
-            "description": "UUID of the reporting point",
-            "example": "0000-ffff-0000-ffff"
-          },
-          "updatedAt": {
-            "type": "string",
-            "format": "date-time",
-            "example": "2020-01-01T00:00:00Z"
-          },
-          "name": {
-            "type": "string",
-            "minLength": 1,
-            "maxLength": 32,
-            "example": "NW"
-          },
-          "latitude": {
-            "type": "number",
-            "format": "double",
-            "example": 33.6407
-          },
-          "longitude": {
-            "type": "number",
-            "format": "double",
-            "example": -84.4277
-          },
-          "elevation": {
-            "type": "integer",
-            "format": "int32",
-            "nullable": true,
-            "description": "Elevation in feet",
-            "example": 1026
-          },
-          "isAgl": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if elevation is Above Ground Level",
-            "example": false
-          },
-          "isCompulsory": {
-            "type": "boolean",
-            "nullable": true,
-            "description": "Indicates if this is a compulsory reporting point",
-            "example": true
-          }
-        },
-        "description": ""
+        }
       },
       "ReadRunway": {
         "type": "object",
@@ -3134,8 +2649,7 @@
             "description": "The user's username.",
             "example": "john_doe"
           }
-        },
-        "description": ""
+        }
       },
       "SearchResult": {
         "type": "object",
@@ -3146,7 +2660,7 @@
           "airports": {
             "type": "array",
             "items": {
-              "$ref": "#/components/schemas/ReadListAirport"
+              "$ref": "#/components/schemas/ListAirport"
             }
           }
         }
@@ -3179,6 +2693,75 @@
             "example": "Hartsfield–Jackson Atlanta International Airport"
           }
         }
+      },
+      "StripeCustomer": {
+        "type": "object",
+        "required": [
+          "id",
+          "data",
+          "stripeCustomerId",
+          "userId",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "data": {},
+          "stripeCustomerId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "StripeSubscription": {
+        "type": "object",
+        "required": [
+          "id",
+          "data",
+          "stripeSubscriptionId",
+          "userId",
+          "createdAt",
+          "updatedAt"
+        ],
+        "properties": {
+          "id": {
+            "type": "string"
+          },
+          "data": {},
+          "stripeSubscriptionId": {
+            "type": "string"
+          },
+          "userId": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "SubscriptionPlan": {
+        "type": "string",
+        "enum": [
+          "plus"
+        ],
+        "description": "Subscription plans"
       },
       "TooManyRequestsError": {
         "type": "object",
