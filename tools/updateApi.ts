@@ -6,6 +6,7 @@ import axios from 'axios';
 updateApiDoc();
 
 async function updateApiDoc() {
+  const blacklistedPathPrefixes = ['/account', '/internal', '/users', '/webhooks'];
 
   console.log('🔄 Retrieving AeroDB API documentation...');
   try {
@@ -14,7 +15,7 @@ async function updateApiDoc() {
     // Remove private paths from public documentation.
     const filteredPaths = Object.fromEntries(
       Object.entries(apiFile.data.paths).filter(([path]) => {
-        return !path.startsWith('/account') && !path.startsWith('/internal') && !path.startsWith('/users');
+        return !blacklistedPathPrefixes.some((prefix) => path.startsWith(prefix));
       })
     );
 
