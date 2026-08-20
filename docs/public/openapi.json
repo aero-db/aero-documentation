@@ -2,7 +2,7 @@
   "openapi": "3.0.0",
   "info": {
     "title": "AeroDB API",
-    "version": "1.2.5",
+    "version": "1.2.7",
     "summary": "The AeroDB API provides access to a wide range of aeronautical data.",
     "description": "## General Information\n\n- All properties are **always returned** and **must be provided**,\nbut can be `null` if not applicable.\n- Some endpoints require **authentication via API key**.\n\n## Filtering, Sorting & Offset\n\nCertain endpoints support **filtering**, **sorting**, and **offset** to control and refine list results.\n\n### Query Parameters\n\n| Parameter | Type | Default | Description |\n|------------|-------|----------|--------------|\n| `limit` | `int32` | `100` | Maximum number of items per page. Cannot exceed **300**. |\n| `offset` | `int32` | `0` | Number of items to skip before starting to collect results. |\n| `filter` | `string` (Base64) | — | Base64-encoded JSON object defining filtering conditions. |\n| `sort` | `string` (Base64) | — | Base64-encoded JSON object defining sorting order. |\n\n---\n\n### Filtering Example\n\nYou can filter airports by one or more properties using a **Base64-encoded JSON filter**.\n\n#### JSON before encoding:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n```\n\n#### Final request:\n> /airports?limit=50&offset=0&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19\n\n---\n\n### Sorting Example\n\nYou can define multiple sort rules, each specifying a property and direction (`asc` or `desc`).\n\n#### JSON before encoding:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Base64 encoded:\n```\neyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n```\n\n#### Final request:\n> /airports?limit=20&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\n---\n\n### Combined Example\n\nYou can combine **filter**, **sort**, **limit**, and **offset** in a single request.\n\n#### Decoded filter value:\n```json\n{\n  \"AND\": [\n    {\n      \"countryCode\": {\n        \"in\": [\"ES\"]\n      }\n    }\n  ]\n}\n```\n\n#### Decoded sort value:\n```json\n{\n  \"sort\": [\n    { \"name\": \"asc\" },\n    { \"city\": \"desc\" }\n  ]\n}\n```\n\n#### Final request:\n> /airports?limit=100&offset=200&filter=eyJBTkQiOlt7ImNvdW50cnlDb2RlIjp7ImluIjpbIkVTIl19fV19&sort=eyJzb3J0IjpbeyJuYW1lIjoiYXNjIn0seyJjaXR5IjoiZGVzYyJ9XX0=\n\nThis will return up to **100 Spanish airports**, skipping the first **200**, sorted by **name (asc)** then **city (desc)**.\n\n---\n\n## Rate Limiting\n\n- The API enforces a per-IP rate limit of approximately **10 requests per second**.\n- Exceeding this limit returns a `429 Too Many Requests` response.\n\nUse these headers to monitor your current rate limit status:\n\n- `X-Ratelimit-Limit`\n- `X-Ratelimit-Remaining`\n- `X-Ratelimit-Reset-Ms`\n\n---\n\n© AeroDB — All rights reserved."
   },
@@ -27,6 +27,9 @@
     },
     {
       "name": "Search"
+    },
+    {
+      "name": "Changes"
     },
     {
       "name": "Countries"
@@ -253,7 +256,7 @@
       "get": {
         "operationId": "Airports_get",
         "summary": "Get one airport",
-        "description": "Get a unique airport by its identifier.\n\nThis operation retreive additional information, including its runways and frequencies.",
+        "description": "Get a unique airport by its identifier.\n\nThis operation retreive additional information, including its runways, taxiways and frequencies.",
         "parameters": [
           {
             "name": "identifier",
@@ -389,6 +392,71 @@
           {
             "ApiKeyAuth": []
           }
+        ]
+      }
+    },
+    "/changes": {
+      "get": {
+        "operationId": "Changes_list",
+        "summary": "List changes",
+        "description": "Return a list of item changes.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/ListParameters.limit"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.offset"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.filter"
+          },
+          {
+            "$ref": "#/components/parameters/ListParameters.sort"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The request has succeeded.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "required": [
+                    "count",
+                    "totalCount",
+                    "items"
+                  ],
+                  "properties": {
+                    "count": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Number of items returned",
+                      "example": 10
+                    },
+                    "totalCount": {
+                      "type": "integer",
+                      "format": "int32",
+                      "description": "Total number of items available",
+                      "example": 100
+                    },
+                    "items": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/components/schemas/ReadChange"
+                      }
+                    }
+                  },
+                  "description": "Represents a paginated list of items."
+                }
+              }
+            }
+          }
+        },
+        "tags": [
+          "Changes"
+        ],
+        "security": [
+          {}
         ]
       }
     },
@@ -1049,31 +1117,6 @@
           }
         }
       }
-    },
-    "/webhooks/stripe": {
-      "post": {
-        "operationId": "Internal_stripeWebhook",
-        "summary": "Stripe Webhook Handler",
-        "parameters": [],
-        "responses": {
-          "200": {
-            "description": "The request has succeeded."
-          }
-        },
-        "tags": [
-          "Internal"
-        ],
-        "requestBody": {
-          "required": true,
-          "content": {
-            "text/plain": {
-              "schema": {
-                "type": "string"
-              }
-            }
-          }
-        }
-      }
     }
   },
   "components": {
@@ -1637,7 +1680,8 @@
           "isClosed",
           "isVFR",
           "isIFR",
-          "pprRequired"
+          "pprRequired",
+          "geometry"
         ],
         "properties": {
           "id": {
@@ -1781,6 +1825,10 @@
             "nullable": true,
             "description": "Indicates if prior permission is required for landing",
             "example": false
+          },
+          "geometry": {
+            "nullable": true,
+            "description": "A GeoJSON geometry representing the airport location and shape."
           }
         },
         "description": "The template for omitting properties."
@@ -1938,7 +1986,10 @@
           "isIFR",
           "pprRequired",
           "runways",
-          "frequencies"
+          "taxiways",
+          "helipads",
+          "frequencies",
+          "geometry"
         ],
         "properties": {
           "id": {
@@ -2089,11 +2140,27 @@
               "$ref": "#/components/schemas/ReadRunway"
             }
           },
+          "taxiways": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadTaxiway"
+            }
+          },
+          "helipads": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadHelipad"
+            }
+          },
           "frequencies": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ReadFrequency"
             }
+          },
+          "geometry": {
+            "nullable": true,
+            "description": "A GeoJSON geometry representing the airport location and shape."
           }
         }
       },
@@ -2192,7 +2259,6 @@
             "example": false
           },
           "geometry": {
-            "type": "string",
             "nullable": true,
             "description": "GeoJSON representation of the airspace geometry",
             "example": "{ \"type\": \"Polygon\", \"coordinates\": [ [ [30, 10], [40, 40], [20, 40], [10, 20], [30, 10] ] ] }"
@@ -2223,6 +2289,43 @@
           }
         },
         "description": "Represents an airspace with its properties, classification, and operational characteristics.\nAn airspace is a defined three-dimensional region of airspace within which specific rules,\nrestrictions, or procedures may apply to aircraft operations."
+      },
+      "ReadChange": {
+        "type": "object",
+        "required": [
+          "id",
+          "category",
+          "itemId",
+          "date",
+          "changes"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the change entry.",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "category": {
+            "type": "string",
+            "description": "Singular lowercase category of the changed item.\n\nExamples: `airport`, `airspace`, `notam`.",
+            "example": "airport"
+          },
+          "itemId": {
+            "type": "string",
+            "description": "Canonical database id of the changed item.",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "date": {
+            "type": "string",
+            "format": "date-time",
+            "description": "Date when the change was recorded.",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "changes": {
+            "description": "JSON payload containing an RFC 6902 JSON Patch document.\n\nExample:\n```json\n[\n  { \"op\": \"replace\", \"path\": \"/name\", \"value\": \"Updated Geneva\" }\n]\n```"
+          }
+        },
+        "description": "Represents a stored item change.\n\nContains a JSON Patch document\nas defined by RFC 6902."
       },
       "ReadFrequency": {
         "type": "object",
@@ -2263,6 +2366,66 @@
             "type": "number",
             "format": "float",
             "example": 118.83
+          }
+        }
+      },
+      "ReadHelipad": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "isLighted",
+          "latitude",
+          "longitude",
+          "elevation",
+          "geometry"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Helipad",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "example": "4"
+          },
+          "isLighted": {
+            "type": "boolean",
+            "nullable": true,
+            "description": "True if the helipad is lighted, false if not, null if unknown.",
+            "example": false
+          },
+          "latitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Latitude of the helipad in decimal degrees, null if unknown.",
+            "example": 40.7128
+          },
+          "longitude": {
+            "type": "number",
+            "format": "float",
+            "nullable": true,
+            "description": "Longitude of the helipad in decimal degrees, null if unknown.",
+            "example": -74.006
+          },
+          "elevation": {
+            "type": "integer",
+            "format": "int32",
+            "nullable": true,
+            "description": "Elevation of the helipad in feet, null if unknown.",
+            "example": 33
+          },
+          "geometry": {
+            "nullable": true,
+            "description": "A GeoJSON geometry representing the helipad location and shape."
           }
         }
       },
@@ -2461,7 +2624,8 @@
           "highEndHeading",
           "highEndDisplacedThreshold",
           "highEndLatitude",
-          "highEndLongitude"
+          "highEndLongitude",
+          "geometry"
         ],
         "properties": {
           "id": {
@@ -2569,6 +2733,40 @@
             "format": "float",
             "nullable": true,
             "example": -74.006
+          },
+          "geometry": {
+            "nullable": true,
+            "description": "A GeoJSON geometry representing the runway location and shape."
+          }
+        }
+      },
+      "ReadTaxiway": {
+        "type": "object",
+        "required": [
+          "id",
+          "updatedAt",
+          "name",
+          "geometry"
+        ],
+        "properties": {
+          "id": {
+            "type": "string",
+            "description": "UUID of the Taxiway",
+            "example": "0000-ffff-0000-ffff"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time",
+            "example": "2020-01-01T00:00:00Z"
+          },
+          "name": {
+            "type": "string",
+            "nullable": true,
+            "example": "A"
+          },
+          "geometry": {
+            "nullable": true,
+            "description": "A GeoJSON geometry representing the taxiway location and shape."
           }
         }
       },
@@ -2607,13 +2805,27 @@
       "SearchResult": {
         "type": "object",
         "required": [
-          "airports"
+          "airports",
+          "airlines",
+          "notams"
         ],
         "properties": {
           "airports": {
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/ListAirport"
+            }
+          },
+          "airlines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadAirline"
+            }
+          },
+          "notams": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReadNotam"
             }
           }
         }
