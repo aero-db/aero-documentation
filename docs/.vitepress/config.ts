@@ -47,6 +47,7 @@ export default defineConfig({
       { text: 'Notams', link: '/operations/Notams_list.html' },
       { text: 'Airlines', link: '/operations/Airlines_list.html' },
       { text: 'Airspaces', link: '/operations/Airspaces_list.html' },
+      { text: 'Back to the app', link: 'https://aerodb.net', target: '_blank', rel: 'noreferrer' },
     ],
     search: {
       provider: 'local',
